@@ -1,0 +1,26 @@
+{
+  "name": "screenshot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "api.js",
+  "dependencies": {
+    "@slack/client": "^3.9.0",
+    "browserstack": "^1.5.0"
+  },
+  "devDependencies": {
+    "node-slackr": "^0.1.4"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kymwei/ScreenShotAPI.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kymwei/ScreenShotAPI/issues"
+  },
+  "homepage": "https://github.com/kymwei/ScreenShotAPI#readme"
+}
