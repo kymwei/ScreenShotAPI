@@ -1,13 +1,14 @@
 var BrowserStack = require("browserstack");
 var Credentials = require("./credentials.js");
+var slackToken = require("./slack.js");
 
 var screenshotClient = BrowserStack.createScreenshotClient(Credentials.browserStackCredentials());
 var restclient = BrowserStack.createClient(Credentials.browserStackCredentials());
-var websiteUrl = "http://www.chefmoomoo.com/";
+var websiteUrl = "https://test27.dev.kbb.com/honda/accord/?newmmymm=true";
 
 var WebClient = require('@slack/client').WebClient;
-
-var token = process.env.SLACK_API_TOKEN || 'xoxp-173151743030-172346769218-172561175796-d868febf3ccf01eaa281e7895364fb46'; //see section above on sensitive data
+console.log(slackToken.slack.token)
+var token = process.env.SLACK_API_TOKEN || slackToken.slack.token; //see section above on sensitive data
 
 var web = new WebClient(token);
 
@@ -20,9 +21,10 @@ screenshotClient.getBrowsers(function(error, browsers) {
 	var options = {};
 	options.browsers = browsersToScreenshot;
     options.url = websiteUrl;
+    options.local = true;
 
 	// use screenshot api
-
+	console.log(options);
 	screenshotClient.generateScreenshots(options, generateScreenshotsCallback);
 
 
@@ -73,7 +75,7 @@ function generateScreenshotsCallback(error, job) {
                 screenshotClient.getJob(job.job_id, screenShotJobCallcallback)
                 count ++;
             }
-            , 1000);
+            , 3000);
 	}
 }
 
