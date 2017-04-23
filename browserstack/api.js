@@ -4,7 +4,7 @@ var slackToken = require("./slack.js");
 
 var screenshotClient = BrowserStack.createScreenshotClient(Credentials.browserStackCredentials());
 var restclient = BrowserStack.createClient(Credentials.browserStackCredentials());
-var websiteUrl = "https://test27.dev.kbb.com/honda/accord/?newmmymm=true";
+var websiteUrl = "https://www.cnn.com";
 
 var WebClient = require('@slack/client').WebClient;
 console.log(slackToken.slack.token)
