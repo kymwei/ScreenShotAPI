@@ -22,6 +22,8 @@ Syntax highlighted code block
 
 
 #slack API
+- https://api.slack.com/apps
+- https://api.slack.com/slash-commands
 - https://slackapi.github.io/node-slack-sdk/basic_usage.html
 - https://api.slack.com/custom-integrations/legacy-tokens
 - https://github.com/smallwins/slack
