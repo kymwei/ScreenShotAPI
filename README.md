@@ -30,8 +30,7 @@ Syntax highlighted code block
 
 #Browser Stack
 - https://www.browserstack.com/screenshots/api#screenshots-states
-- https://www.browserstack.com/local-testing#getting-started
--
+- https://www.browserstack.com/local-testing#getting-started-
 
 
 ## cmd
