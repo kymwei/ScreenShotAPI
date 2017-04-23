@@ -1,30 +1,32 @@
 var express = require('express');
+var bodyParser = require('body-parser')
 var app = express();
-app.get('/', function(req, res) {
-  var request = {};
-    //request.startTime = req._startTime;
-    //request.app = req.app;
-    //request.body = req.body;
-    //request.client = req.client;
-    //request.complete = req.complete;
-    //request.connection = req.connection;
-    //request.cookies = req.cookies;
-    //request.files = req.files;
-    //request.headers = req.headers;
-    //request.httpVersion = req.httpVersion;
-    //request.httpVersionMajor = req.httpVersionMajor;
-    //request.httpVersionMinor = req.httpVersionMinor;
-    //request.method = req.method;
-    //request.next = req.next;
-    //request.originalUrl = req.originalUrl;
-    //request.params = req.params;
-    //request.query = req.query;
-    //request.readable = req.readable;
-    //request.route = req.route;
-    //request.signedCookies = req.signedCookies;
-    //request.socket = req.socket;
-    //request.url = req.url;
-  res.send(req.originalUrl);
-});
-app.listen(3001);
-console.log('Listening on port 3001...');
+var PORT = 1234
+app.route('/SlackEndPoint')
+    .get(function (req, res) {
+        res.sendStatus(200)
+    })
+    .post(bodyParser.urlencoded({ extended: true }), function (req, res) {
+        //if (req.body.token !== VERIFY_TOKEN) {
+            //return res.sendStatus(401)
+        //}
+
+        var url = req.body.text;
+        var user = req.body.user_name;
+        var message = 'Requested by ' + user + '.  Generating screenshots for: ' + url;
+
+        console.log(req.body);
+
+        res.json({
+            response_type: 'in_channel',
+            text: message
+        })
+    })
+
+app.listen(PORT, function (err) {
+    if (err) {
+        return console.error('Error starting server: ', err)
+    }
+
+    console.log('Server successfully started on port %s', PORT)
+})
