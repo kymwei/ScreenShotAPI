@@ -1,7 +1,6 @@
 
 ### Markdown
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
 
 ```markdown
 Syntax highlighted code block
@@ -35,3 +34,4 @@ Syntax highlighted code block
 
 ## cmd
 - to start express server `npm run start`
+- make new file `type NUL > 1.js`
