@@ -31,3 +31,7 @@ Syntax highlighted code block
 - https://www.browserstack.com/screenshots/api#screenshots-states
 - https://www.browserstack.com/local-testing#getting-started
 -
+
+
+## cmd
+- to start express server `npm run start`
