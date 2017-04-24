@@ -1,7 +1,10 @@
 var express = require('express');
 var bodyParser = require('body-parser')
+var request = require('request');
 var app = express();
 var PORT = 1234
+
+var browserStackGenerateScreenShotEndPoint = 'http://chefmoomoo.com:1002/generateScreenShot'
 app.route('/SlackEndPoint')
     .get(function (req, res) {
         res.sendStatus(200)
@@ -21,9 +24,26 @@ app.route('/SlackEndPoint')
             response_type: 'in_channel',
             text: message
         })
+
+        // post to browserStackGenerateScreenShotEndPoint
+        // url=www.yahoo.com
+        // username=raytam
+
+        var options={
+            'url': url,
+            'username': user
+        };
+
+        request({
+                url:browserStackGenerateScreenShotEndPoint,
+                method:"POST",
+                json:true},function(error,response,body){
+                console.log(body)
+            }
+        );
     })
 
-app.listen(PORT, function (err) {
+app.listen(PORT, function (er) {
     if (err) {
         return console.error('Error starting server: ', err)
     }
