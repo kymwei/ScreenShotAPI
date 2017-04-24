@@ -1,6 +1,6 @@
 var express = require('express');
 var bodyParser = require('body-parser')
-var request = require('request');
+var http = require('http');
 var app = express();
 var PORT = 1234
 
@@ -29,18 +29,38 @@ app.route('/SlackEndPoint')
         // url=www.yahoo.com
         // username=raytam
 
-        var options={
-            'url': url,
-            'username': user
-        };
+        var requestData = {
+            "url": url,
+            "username": user
+        }
 
+        // QPX REST API URL (I censored my api key)
+        url = "https://www.googleapis.com/qpxExpress/v1/trips/search?key=myApiKey"
+
+        // fire request
         request({
-                url:browserStackGenerateScreenShotEndPoint,
-                method:"POST",
-                json:true},function(error,response,body){
+            url: browserStackGenerateScreenShotEndPoint,
+            json: true,
+            multipart: {
+                chunked: false,
+                data: [
+                    {
+                        'content-type': 'application/json',
+                        body: requestData
+                    }
+                ]
+            }
+        }, function (error, response, body) {
+            if (!error && response.statusCode === 200) {
                 console.log(body)
             }
-        );
+            else {
+
+                console.log("error: " + error)
+                console.log("response.statusCode: " + response.statusCode)
+                console.log("response.statusText: " + response.statusText)
+            }
+        })
     })
 
 app.listen(PORT, function (er) {
