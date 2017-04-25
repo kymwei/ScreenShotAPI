@@ -3,8 +3,24 @@ var bodyParser = require('body-parser')
 var request = require('request');
 var app = express();
 var PORT = 1234
+var pendingJobs = [];
 
 var browserStackGenerateScreenShotEndPoint = 'http://10.228.150.7:300/generatescreenshot'
+
+app.route('/TriggerMessage')
+    .get(function (req, res) {
+        request.post(
+            browserStackGenerateScreenShotEndPoint,
+            { json: { url: 'test01.dev.kbb.com', username: 'raytam', timestamp: new Date().getTime() } },
+            function (error, response, body) {
+                if (!error && response.statusCode == 200) {
+                    console.log(body)
+                    pendingJobs.push(body);
+                }
+            }
+        );
+
+    })
 
 app.route('/BrowserstackScreenshotComplete')
     .get(function (req, res) {
@@ -36,14 +52,12 @@ app.route('/SlackEndPoint')
         })
 
         // post to browserStackGenerateScreenShotEndPoint
-        // url=www.yahoo.com
-        // username=raytam
         request.post(
             browserStackGenerateScreenShotEndPoint,
-            { json: { url: url, username: user } },
+            { json: { url: url, username: user, timestamp: new Date().getTime() } },
             function (error, response, body) {
                 if (!error && response.statusCode == 200) {
-                    console.log(body)
+                    console.log(body);
                 }
             }
         );
