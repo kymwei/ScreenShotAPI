@@ -7,6 +7,9 @@ var slackToken = require("../slack.js");
 var token = process.env.SLACK_API_TOKEN || slackToken.slack.token; //see section above on sensitive data
 var WebClient = require('@slack/client').WebClient;
 var web = new WebClient(token);
+var request = require('request');
+
+var SlackApiBrowserstackScreenshotCompleteEndPoint = 'http://10.228.150.158:1234/BrowserstackScreenshotComplete'
 
 exports.list_all_browsers = function(req, res){
     var data = {'res':'hi cutie pie'};
@@ -62,7 +65,7 @@ exports.getScreenShot = function(req, res){
 
 var SlackScreenShotEndPoint = 'http://10.228.150.158:1234/BrowserstackScreenshotComplete';
 function screenShotJobCallcallback(error, job) {
-
+    console.log('polling for image');
     if(error) {
         console.log(error.stack);
     }else{
@@ -70,7 +73,16 @@ function screenShotJobCallcallback(error, job) {
 
 
         if(job.screenshots[0].image_url) {
-            console.log(job);
+            console.log('image found')
+            request.post(
+                SlackApiBrowserstackScreenshotCompleteEndPoint,
+                { json: { ImageUrl: job.screenshots[0].image_url }  },
+                function (error, response, body) {
+                    if (!error && response.statusCode == 200) {
+                        res.send('from screenShotJobCallcallback message sent');
+                    }
+                }
+            );
             // web.chat.postMessage('#general', job, function (err, res) {
             //     if (err) {
             //         console.log('Error:', err);

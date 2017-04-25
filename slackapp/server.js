@@ -5,7 +5,7 @@ var app = express();
 var PORT = 1234
 var pendingJobs = [];
 
-var browserStackGenerateScreenShotEndPoint = 'http://10.228.150.7:300/generatescreenshot'
+var browserStackGenerateScreenShotEndPoint = 'http://10.228.150.158:300/generatescreenshot'
 
 app.route('/TriggerMessage')
     .get(function (req, res) {
@@ -16,6 +16,7 @@ app.route('/TriggerMessage')
                 if (!error && response.statusCode == 200) {
                     console.log(body)
                     pendingJobs.push(body);
+                    res.send('message sent');
                 }
             }
         );
@@ -27,7 +28,7 @@ app.route('/BrowserstackScreenshotComplete')
         res.sendStatus(200)
     })
     .post(bodyParser.urlencoded({ extended: true }), function (req, res) {
-
+        console.log(req.body);
     })
 
 
