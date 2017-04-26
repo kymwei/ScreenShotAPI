@@ -3,7 +3,11 @@ var bodyParser = require('body-parser')
 var request = require('request');
 var app = express();
 var PORT = 1234
-var pendingJobs = [];
+var messageQueue = [];
+var slackToken = require("./slack.js");
+var token = process.env.SLACK_API_TOKEN || slackToken.slack.token; //see section above on sensitive data
+var WebClient = require('@slack/client').WebClient;
+var web = new WebClient(token);
 
 var browserStackGenerateScreenShotEndPoint = 'http://localhost:300/generatescreenshot'
 
@@ -16,7 +20,6 @@ app.route('/TriggerMessage')
             function (error, response, body) {
                 if (!error && response.statusCode == 200) {
                     console.log(body)
-                    pendingJobs.push(body);
                     res.send('message sent');
                 }
             }
@@ -30,9 +33,45 @@ app.route('/BrowserstackScreenshotComplete')
     })
     .post(bodyParser.urlencoded({ extended: true }), function (req, res) {
         console.log('Browserstack Screenshot Complete');
-        console.log(req.body);
-        console.log(req.body.screenshot.screenshots[0]);
+
+        for(var i = 0; i < req.body.screenshot.screenshots.length; i++) {
+            ssObj = req.body.screenshot.screenshots[i];
+            var msg = ssObj.image_url + ' for ' + ssObj.url + ' ' + ssObj.os + ' ' + ssObj.os_version + ': ' + ssObj.browser;
+
+            sendMessageToSlack('#general', msg);
+        }
     })
+
+function sendMessageToSlack(channel, message){
+    var message;
+    message.channel = channel;
+    message.message = message;
+    console.log(message.message);
+    messageQueue.push(message);
+
+    ProcessMessageQueue();
+}
+
+function ProcessMessageQueue(){
+    if(messageQueue.length > 0) {
+        console.log('posting message to slack');
+        var msg = messageQueue.shift();
+        web.chat.postMessage(msg.channel, msg.message, PostMessageToSlackCallback);
+    }
+}
+
+function PostMessageToSlackCallback(err, res){
+    if (err) {
+        console.log('Error:', err);
+    } else {
+        console.log('posted message to slack');
+        console.log('Message sent: ', res);
+        if(messageQueue.length > 0) {
+            ProcessMessageQueue();
+        }
+
+    }
+}
 
 
 app.route('/SlackEndPoint')

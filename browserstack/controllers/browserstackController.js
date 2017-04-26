@@ -3,10 +3,8 @@
 var BrowserStack = require("browserstack");
 var Credentials = require("../credentials.js");
 var screenshotClient = BrowserStack.createScreenshotClient(Credentials.browserStackCredentials());
-var slackToken = require("../slack.js");
-var token = process.env.SLACK_API_TOKEN || slackToken.slack.token; //see section above on sensitive data
-var WebClient = require('@slack/client').WebClient;
-var web = new WebClient(token);
+
+
 var request = require('request');
 
 var SlackApiBrowserstackScreenshotCompleteEndPoint = 'http://localhost:1234/BrowserstackScreenshotComplete'
@@ -41,7 +39,7 @@ exports.getScreenShot = function(req, res){
         // use screenshot api
         //res.json(user_id + 'screen for ' + url +' is processing' + job.job_id);
         screenshotClient.generateScreenshots(options, function(error, job){
-            console.log("get request from slack api")
+            console.log("get request from slack app")
             if(error) {
 
             }else{
