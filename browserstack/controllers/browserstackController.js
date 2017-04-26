@@ -69,9 +69,13 @@ function screenShotJobCallcallback(error, job) {
         console.log(error.stack);
     }else{
 
+        var allImageReady = false;
+        for( var i = 0; i<job.screenshots.length ; i ++){
+            console.log()
+            allImageReady = job.screenshots[i].image_url === null ? false : true;
+        }
 
-
-        if(job.screenshots[0].image_url) {
+        if(allImageReady) {
             console.log('image found');
 
             request.post(
@@ -83,24 +87,6 @@ function screenShotJobCallcallback(error, job) {
                     }
                 }
             );
-            // web.chat.postMessage('#general', job, function (err, res) {
-            //     if (err) {
-            //         console.log('Error:', err);
-            //     } else {
-            //         console.log(count);
-            //         console.log('Message sent: ', res);
-            //
-            //     }
-            // // });
-            // request.post(
-            //     SlackScreenShotEndPoint,
-            //     { json: { url: url, username: user } },
-            //     function (error, response, body) {
-            //         if (!error && response.statusCode == 200) {
-            //             console.log(body)
-            //         }
-            //     }
-            // );
             clearInterval(getScreenShot);
 
         }
