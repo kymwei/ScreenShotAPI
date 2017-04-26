@@ -33,23 +33,22 @@ app.route('/BrowserstackScreenshotComplete')
     })
     .post(bodyParser.urlencoded({ extended: true }), function (req, res) {
         console.log('Browserstack Screenshot Complete');
+        console.log(req.body);
 
         for(var i = 0; i < req.body.screenshot.screenshots.length; i++) {
             ssObj = req.body.screenshot.screenshots[i];
-            var msg = ssObj.image_url + ' for ' + ssObj.url + ' ' + ssObj.os + ' ' + ssObj.os_version + ': ' + ssObj.browser;
+            var msg = ssObj.image_url + ' ' + ssObj.url + ' ' + ssObj.os + ' ' + ssObj.os_version + ': ' + ssObj.browser;
 
-            sendMessageToSlack('#general', msg);
+            addMessageToQueue('#general', msg);
         }
+        ProcessMessageQueue();
     })
 
-function sendMessageToSlack(channel, message){
-    var message;
-    message.channel = channel;
-    message.message = message;
-    console.log(message.message);
-    messageQueue.push(message);
-
-    ProcessMessageQueue();
+function addMessageToQueue(channel, message){
+    var msg = {};
+    msg.channel = channel;
+    msg.message = message;
+    messageQueue.push(msg);
 }
 
 function ProcessMessageQueue(){
@@ -67,6 +66,7 @@ function PostMessageToSlackCallback(err, res){
         console.log('posted message to slack');
         console.log('Message sent: ', res);
         if(messageQueue.length > 0) {
+            console.log('### Message Queue length ' + messageQueue.length);
             ProcessMessageQueue();
         }
 
