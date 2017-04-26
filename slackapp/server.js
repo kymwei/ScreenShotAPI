@@ -5,14 +5,14 @@ var app = express();
 var PORT = 1234
 var pendingJobs = [];
 
-var browserStackGenerateScreenShotEndPoint = 'http://10.228.150.158:300/generatescreenshot'
+var browserStackGenerateScreenShotEndPoint = 'http://localhost:300/generatescreenshot'
 
 app.route('/TriggerMessage')
     .get(function (req, res) {
         console.log('trigger message');
         request.post(
             browserStackGenerateScreenShotEndPoint,
-            { json: { url: 'test01.dev.kbb.com', username: 'raytam', timestamp: new Date().getTime() } },
+            { json: { url: 'google.com', username: 'raytam', timestamp: new Date().getTime() } },
             function (error, response, body) {
                 if (!error && response.statusCode == 200) {
                     console.log(body)
@@ -31,6 +31,7 @@ app.route('/BrowserstackScreenshotComplete')
     .post(bodyParser.urlencoded({ extended: true }), function (req, res) {
         console.log('Browserstack Screenshot Complete');
         console.log(req.body);
+        console.log(req.body.screenshot.screenshots[0]);
     })
 
 

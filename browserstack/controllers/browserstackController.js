@@ -9,7 +9,7 @@ var WebClient = require('@slack/client').WebClient;
 var web = new WebClient(token);
 var request = require('request');
 
-var SlackApiBrowserstackScreenshotCompleteEndPoint = 'http://10.228.150.158:1234/BrowserstackScreenshotComplete'
+var SlackApiBrowserstackScreenshotCompleteEndPoint = 'http://localhost:1234/BrowserstackScreenshotComplete'
 
 exports.list_all_browsers = function(req, res){
     var data = {'res':'hi cutie pie'};
@@ -41,8 +41,9 @@ exports.getScreenShot = function(req, res){
         // use screenshot api
         //res.json(user_id + 'screen for ' + url +' is processing' + job.job_id);
         screenshotClient.generateScreenshots(options, function(error, job){
+            console.log("get request from slack api")
             if(error) {
-                console.log(error.stack);
+
             }else{
                 res.json({
                     userId: user_id,
@@ -63,7 +64,7 @@ exports.getScreenShot = function(req, res){
 
 };
 
-var SlackScreenShotEndPoint = 'http://10.228.150.158:1234/BrowserstackScreenshotComplete';
+var SlackScreenShotEndPoint = 'http://localhost:1234/BrowserstackScreenshotComplete';
 function screenShotJobCallcallback(error, job) {
     console.log('polling for image');
     if(error) {
@@ -73,10 +74,11 @@ function screenShotJobCallcallback(error, job) {
 
 
         if(job.screenshots[0].image_url) {
-            console.log('image found')
+            console.log('image found');
+
             request.post(
                 SlackApiBrowserstackScreenshotCompleteEndPoint,
-                { json: { ImageUrl: job.screenshots[0].image_url } },
+                {form:{screenshot:job}},
                 function (error, response, body) {
                     if (!error && response.statusCode == 200) {
                         res.send('from screenShotJobCallcallback message sent');
