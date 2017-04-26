@@ -9,6 +9,7 @@ var browserStackGenerateScreenShotEndPoint = 'http://10.228.150.158:300/generate
 
 app.route('/TriggerMessage')
     .get(function (req, res) {
+        console.log('trigger message');
         request.post(
             browserStackGenerateScreenShotEndPoint,
             { json: { url: 'test01.dev.kbb.com', username: 'raytam', timestamp: new Date().getTime() } },
@@ -28,6 +29,7 @@ app.route('/BrowserstackScreenshotComplete')
         res.sendStatus(200)
     })
     .post(bodyParser.urlencoded({ extended: true }), function (req, res) {
+        console.log('Browserstack Screenshot Complete');
         console.log(req.body);
     })
 

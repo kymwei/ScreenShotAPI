@@ -76,7 +76,7 @@ function screenShotJobCallcallback(error, job) {
             console.log('image found')
             request.post(
                 SlackApiBrowserstackScreenshotCompleteEndPoint,
-                { json: { ImageUrl: job.screenshots[0].image_url }  },
+                { json: { ImageUrl: job.screenshots[0].image_url } },
                 function (error, response, body) {
                     if (!error && response.statusCode == 200) {
                         res.send('from screenShotJobCallcallback message sent');
