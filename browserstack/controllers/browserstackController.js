@@ -64,7 +64,7 @@ exports.getScreenShot = function(req, res){
 
 var SlackScreenShotEndPoint = 'http://localhost:1234/BrowserstackScreenshotComplete';
 function screenShotJobCallcallback(error, job) {
-    console.log('polling for image' + new Date().getTime());
+    console.log('polling for image ' + new Date().getTime());
     if(error) {
         console.log(error.stack);
     }else{
