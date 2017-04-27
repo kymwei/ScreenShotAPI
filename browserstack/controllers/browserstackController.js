@@ -7,7 +7,7 @@ var screenshotClient = BrowserStack.createScreenshotClient(Credentials.browserSt
 
 var request = require('request');
 
-var SlackApiBrowserstackScreenshotCompleteEndPoint = 'http://localhost:1234/BrowserstackScreenshotComplete'
+var SlackApiBrowserstackScreenshotCompleteEndPoint = 'http://www.chefmoomoo.com:1234/BrowserstackScreenshotComplete'
 
 exports.list_all_browsers = function(req, res){
     var data = {'res':'hi cutie pie'};

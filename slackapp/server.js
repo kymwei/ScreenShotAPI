@@ -9,7 +9,7 @@ var token = process.env.SLACK_API_TOKEN || slackToken.slack.token; //see section
 var WebClient = require('@slack/client').WebClient;
 var web = new WebClient(token);
 
-var browserStackGenerateScreenShotEndPoint = 'http://localhost:300/generatescreenshot'
+var browserStackGenerateScreenShotEndPoint = 'http://www.chefmoomoo.com:300/generatescreenshot'
 
 app.route('/TriggerMessage')
     .get(function (req, res) {
