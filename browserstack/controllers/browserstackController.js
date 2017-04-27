@@ -25,7 +25,7 @@ exports.getScreenShot = function(req, res){
 
     screenshotClient.getBrowsers(function(error, browsers) {
         var latestChromeBrowser = GetWindows7LatestChromeBrowser(browsers);
-        var iosBrowser = {"os":"ios","os_version":"8.3","browser":"Mobile Safari","device":"iPhone 6","browser_version":null};
+        var iosBrowser = {"os":"android","os_version":"5.0","browser":"Android Browser","device":"Google Nexus 9","browser_version":null};
         var browsersToScreenshot = [];
         browsersToScreenshot.push(latestChromeBrowser);
         browsersToScreenshot.push(iosBrowser);
