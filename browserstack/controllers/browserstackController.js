@@ -38,8 +38,8 @@ exports.getScreenShot = function(req, res){
 
         // use screenshot api
         //res.json(user_id + 'screen for ' + url +' is processing' + job.job_id);
+        console.log("send job to browserstack for url: " + options.url);
         screenshotClient.generateScreenshots(options, function(error, job){
-            console.log("get request from slack app")
             if(error) {
 
             }else{
@@ -49,15 +49,11 @@ exports.getScreenShot = function(req, res){
                     jobid: job.job_id
                 })
                 getScreenShot = setInterval(function() {
-                        console.log("send job to browserstack for url: " + job.url);
                         screenshotClient.getJob(job.job_id, screenShotJobCallcallback)
                     }
                     , 3000);
             }
         });
-
-
-
     });
 
 };
