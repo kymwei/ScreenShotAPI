@@ -71,7 +71,6 @@ function screenShotJobCallcallback(error, job) {
 
         var allImageReady = false;
         for( var i = 0; i<job.screenshots.length ; i ++){
-            console.log()
             allImageReady = job.screenshots[i].image_url === null ? false : true;
         }
 
