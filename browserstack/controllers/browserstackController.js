@@ -49,8 +49,8 @@ exports.getScreenShot = function(req, res){
                     jobid: job.job_id
                 })
                 getScreenShot = setInterval(function() {
+                        console.log("send job to browserstack for url: " + job.url);
                         screenshotClient.getJob(job.job_id, screenShotJobCallcallback)
-                        count ++;
                     }
                     , 3000);
             }
@@ -62,7 +62,6 @@ exports.getScreenShot = function(req, res){
 
 };
 
-var SlackScreenShotEndPoint = 'http://localhost:1234/BrowserstackScreenshotComplete';
 function screenShotJobCallcallback(error, job) {
     console.log('polling for image ' + new Date().getTime());
     if(error) {
@@ -94,7 +93,6 @@ function screenShotJobCallcallback(error, job) {
 }
 
 var getScreenShot;
-var count = 0;
 function generateScreenshotsCallback(error, job ) {
 
     if(error) {
@@ -103,7 +101,6 @@ function generateScreenshotsCallback(error, job ) {
 
         getScreenShot = setInterval(function() {
                 screenshotClient.getJob(job.job_id, screenShotJobCallcallback)
-                count ++;
             }
             , 3000);
     }
