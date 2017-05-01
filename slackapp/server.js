@@ -2,14 +2,46 @@ var express = require('express');
 var bodyParser = require('body-parser')
 var request = require('request');
 var app = express();
-var PORT = 1234
+var PORT = 1234;
 var messageQueue = [];
-var slackToken = require("./slack.js");
-var token = process.env.SLACK_API_TOKEN || slackToken.slack.token; //see section above on sensitive data
+var slackToken = require("./slackCredentials.js");
+var token = process.env.SLACK_API_TOKEN || slackToken.slack.token;
 var WebClient = require('@slack/client').WebClient;
 var web = new WebClient(token);
 
 var browserStackGenerateScreenShotEndPoint = 'http://www.chefmoomoo.com:300/generatescreenshot'
+
+app.route('/SlackEndPoint')
+    .get(function (req, res) {
+        res.sendStatus(200)
+    })
+    .post(bodyParser.urlencoded({ extended: true }), function (req, res) {
+        //if (req.body.token !== VERIFY_TOKEN) {
+            //return res.sendStatus(401)
+        //}
+
+        var url = req.body.text;
+        var user = req.body.user_name;
+        var message = 'Requested by ' + user + '.  Generating screenshots for: ' + url;
+
+        console.log(req.body);
+
+        res.json({
+            response_type: 'in_channel',
+            text: message
+        })
+
+        // post to browserStackGenerateScreenShotEndPoint
+        request.post(
+            browserStackGenerateScreenShotEndPoint,
+            { json: { url: url, username: user, timestamp: new Date().getTime() } },
+            function (error, response, body) {
+                if (!error && response.statusCode == 200) {
+                    console.log(body);
+                }
+            }
+        );
+    })
 
 app.route('/TriggerMessage')
     .get(function (req, res) {
@@ -74,37 +106,7 @@ function PostMessageToSlackCallback(err, res){
 }
 
 
-app.route('/SlackEndPoint')
-    .get(function (req, res) {
-        res.sendStatus(200)
-    })
-    .post(bodyParser.urlencoded({ extended: true }), function (req, res) {
-        //if (req.body.token !== VERIFY_TOKEN) {
-            //return res.sendStatus(401)
-        //}
 
-        var url = req.body.text;
-        var user = req.body.user_name;
-        var message = 'Requested by ' + user + '.  Generating screenshots for: ' + url;
-
-        console.log(req.body);
-
-        res.json({
-            response_type: 'in_channel',
-            text: message
-        })
-
-        // post to browserStackGenerateScreenShotEndPoint
-        request.post(
-            browserStackGenerateScreenShotEndPoint,
-            { json: { url: url, username: user, timestamp: new Date().getTime() } },
-            function (error, response, body) {
-                if (!error && response.statusCode == 200) {
-                    console.log(body);
-                }
-            }
-        );
-    })
 
 app.listen(PORT, function (err) {
     if (err) {
