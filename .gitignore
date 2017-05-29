@@ -1,5 +1,4 @@
 node_modules/
 .idea/
-credentials.js
-credential.js
-slack.js
+SlackCredentials.js
+BrowserStackCredentials.js
