@@ -135,6 +135,32 @@ function getBrowsers(){
 
     });
 }
+app.route('/browser')
+    .post(bodyParser.urlencoded({ extended: true }), function (req, res) {
+        console.log(req.body);
+        var browserType = req.body.browserType;
+
+        var test;
+        screenshotClient.getBrowsers(function(error, browsers) {
+
+            // switch(req.body.browserType) {
+            //     case 'desktop':
+            //         code block
+            //         break;
+            //     case 'tablet':
+            //         code block
+            //         break;
+            //     default:
+            //         code block
+            // }
+            res.send(browsers);
+
+
+        });
+
+
+        //res.send(browserType);
+    })
 
 /// Routes ///
 // this is the route to receive the job from the server, the job receiver is get only
@@ -147,10 +173,12 @@ app.route('/SubmitJob')
         // submit job to browserstack with given callback
     })
 
-app.listen(PORT, function (err) {
+
+
+app.listen(port, function (err) {
     if (err) {
         return console.error('Error starting server: ', err)
     }
-    console.log('Slack Server successfully started on port %s', PORT)
+    console.log('Slack Server successfully started on port %s', port)
 })
 /// End Routes ///
