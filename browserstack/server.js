@@ -82,52 +82,26 @@ function getLatest_Smartphone_Android_Browser() {
 
 }
 
-function getDesktopBrowsers(){
+function getLasteVersion(desktopBrowsers, browserName){
+    var browserList = desktopBrowsers.filter(function(browser){
+        return browser.browser === browserName && browser !== null;
+    });
+
+    return browserList.reduce(function(newversion, current){
+        return parseFloat(current.browser_version) > parseFloat(newversion.browser_version) ? current: newversion;
+    });
+}
+
+function getDesktopBrowsers(allBrowsers){
+    var desktopBrowsers = allBrowsers.filter(function(browser){
+       return  browser.os === 'Windows'
+    });
     var browsers = [];
-    browsers.push(getLatest_Desktop_Firefox_Browser());
-    browsers.push(getLatest_Desktop_Chrome_Browser());
-    browsers.push(getLatest_Desktop_Edge_Browser());
-    browsers.push(getLatest_Desktop_IE_Browser());
+    browsers.push(getLasteVersion(desktopBrowsers,'firefox'));
+    browsers.push(getLasteVersion(desktopBrowsers,'chrome'));
+    browsers.push(getLasteVersion(desktopBrowsers,'edge'));
+    browsers.push(getLasteVersion(desktopBrowsers,'ie'));
     return browsers;
-}
-
-function getLatest_Desktop_Firefox_Browser(){
-
-}
-
-function getLatest_Desktop_Chrome_Browser(){
-/*
- // filter chrome browsers
-
- var chromeBrowsers = browsers.filter(function (el) {
- return el.browser == 'chrome',
- el.os_version == '7'}
- );
-
- var highestVersion = 0.0;
- for(var i = 0; i < chromeBrowsers.length - 1; i++) {
- var version = chromeBrowsers[i].browser_version;
- if(!isNaN(version)) {
- if(parseFloat(version) > highestVersion) {
- highestVersion = parseFloat(version);
- }
- }
- }
-
- var latestBrowser = chromeBrowsers.filter(function (el) {
- return el.browser_version == highestVersion}
- )[0];
-
- return(latestBrowser);
- */
-}
-
-function getLatest_Desktop_Edge_Browser(){
-
-}
-
-function getLatest_Desktop_IE_Browser(){
-
 }
 
 function getBrowsers(){
@@ -136,24 +110,30 @@ function getBrowsers(){
     });
 }
 app.route('/browser')
+    .get(bodyParser.urlencoded({ extended: true }), function (req, res) {
+        screenshotClient.getBrowsers(function(error, browsers) {
+            res.send(browsers);
+        });
+    })
     .post(bodyParser.urlencoded({ extended: true }), function (req, res) {
-        console.log(req.body);
-        var browserType = req.body.browserType;
 
-        var test;
         screenshotClient.getBrowsers(function(error, browsers) {
 
-            // switch(req.body.browserType) {
-            //     case 'desktop':
-            //         code block
-            //         break;
-            //     case 'tablet':
-            //         code block
-            //         break;
-            //     default:
-            //         code block
-            // }
-            res.send(browsers);
+            switch(req.body.browserType) {
+                case 'desktop':
+                    var desktopBrowsers = getDesktopBrowsers(browsers);
+                    res.send(desktopBrowsers);
+                    break;
+                case 'tablet':
+                   //code block
+                    break;
+                case 'smartphone':
+                   // code block
+                    break;
+                default:
+                   // code block
+            }
+
 
 
         });
