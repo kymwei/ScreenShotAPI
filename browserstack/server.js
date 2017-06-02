@@ -51,15 +51,28 @@ function getAllPlatormBrowsers(){
     return browsers;
 }
 
-function getTabletBrowsers(){
+function getTabletBrowsers(allBrowsers){
+    var iosBrowsers = allBrowsers.filter(function(browser){
+        return  browser.os === 'ios'
+    });
+    var androidBrowsers = allBrowsers.filter(function(browser){
+        return  browser.os === 'android'
+    });
     var browsers = [];
-    browsers.push(getLatest_Tablet_IOS_Browser());
+    browsers.push(getLatest_Tablet_IOS_Browser(iosBrowsers));
     browsers.push(getLatest_Tablet_Android_Browser());
     return browsers;
 }
 
-function getLatest_Tablet_IOS_Browser() {
+function getLatest_Tablet_IOS_Browser(iosBrowsers) {
+    var browserList = iosBrowsers.filter(function(browser){
+        return browser.device.includes('iPad');
+    });
 
+    var newList=  browserList.sort(function(a, b){
+        return a.device > b.device? 1: -1;
+    });
+    return newList[newList.length-1]
 }
 
 function getLatest_Tablet_Android_Browser() {
@@ -67,15 +80,33 @@ function getLatest_Tablet_Android_Browser() {
 }
 
 
-function getSmartphoneBrowsers(){
+function getSmartphoneBrowsers(allBrowsers){
+    var iosBrowsers = allBrowsers.filter(function(browser){
+        return  browser.os === 'ios'
+    });
+    var androidBrowsers = allBrowsers.filter(function(browser){
+        return  browser.os === 'android'
+    });
+
+
     var browsers = [];
-    browsers.push(getLatest_Smartphone_IOS_Browser());
-    browsers.push(getLatest_Smartphone_Android_Browser());
+
+    browsers.push(getLatest_Smartphone_IOS_Browser(iosBrowsers));
+   // browsers.push(getLatest_Smartphone_Android_Browser());
     return browsers;
 }
 
-function getLatest_Smartphone_IOS_Browser() {
 
+//TODO: Ray substruck plus from here
+function getLatest_Smartphone_IOS_Browser(iosBrowsers) {
+    var browserList = iosBrowsers.filter(function(browser){
+        return browser.device.includes('iPhone');
+    });
+
+    var newList=  browserList.sort(function(a, b){
+        return a.device > b.device? 1: -1;
+    });
+    return newList[newList.length-1]
 }
 
 function getLatest_Smartphone_Android_Browser() {
@@ -125,10 +156,12 @@ app.route('/browser')
                     res.send(desktopBrowsers);
                     break;
                 case 'tablet':
-                   //code block
+                    var tabletBrowsers = getTabletBrowsers(browsers);
+                    res.send(tabletBrowsers);
                     break;
                 case 'smartphone':
-                   // code block
+                    var smartphoneBrowsers = getSmartphoneBrowsers(browsers);
+                    res.send(smartphoneBrowsers);
                     break;
                 default:
                    // code block
