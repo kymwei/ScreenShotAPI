@@ -105,33 +105,40 @@ function Slack_ReceiveMooMooCommand(data){
             "text": "Platforms",
             "fallback": "You are unable to choose a platform",
             "callback_id": "platforms",
-            "color": "#3AA3E3",
+            "color": "#7CD197",
             "attachment_type": "default",
             "actions": [
             {
                 "name": "All",
                 "text": "All",
                 "type": "button",
-                "value": "all",
-                "style": "danger"
+                "value": JSON.stringify({platform:"all",url:data.text}),
+                "style": "primary"
             },
             {
                 "name": "Desktop",
                 "text": "Desktop",
                 "type": "button",
-                "value": "desktop"
+                "value": JSON.stringify({platform:"desktop",url:data.text})
             },
             {
                 "name": "Tablet",
                 "text": "Tablet",
                 "type": "button",
-                "value": "tablet"
+                "value": JSON.stringify({platform:"tablet",url:data.text})
             },
             {
                 "name": "Smartphone",
                 "text": "Smartphone",
                 "type": "button",
-                "value": "smartphone"
+                "value": JSON.stringify({platform:"smartphone",url:data.text})
+            },
+            {
+                "name": "Cancel",
+                "text": "Cancel",
+                "type": "button",
+                "value": JSON.stringify({platform:"no",url:data.text}),
+                "style": "danger"
             }
 
         ]
@@ -181,12 +188,13 @@ app.route('/slack_messageoptions')
     })
 
 // slack_messageaction
+//https://api.slack.com/interactive-messages#responding
 app.route('/slack_messageaction')
     .post(bodyParser.urlencoded({ extended: true }), function (req, res) {
         console.log('slack_messageaction');
         var playload = JSON.parse(req.body.payload);
         console.log(playload);
-        res.send('Awesome, let test ' + playload.actions[0].name +' :heart_eyes_cat:')
+        res.send('Awesome, let\'s test ' + playload.actions[0].name +' for '+ JSON.parse(playload.actions[0].value).url + ' :heart_eyes_cat:')
     })
 
 // browserstack will call back to this function when it's done generating screenshots
@@ -206,14 +214,21 @@ app.route('/slack_moomoo')
         res.sendStatus(200)
     })
     .post(bodyParser.urlencoded({ extended: true }), function (req, res) {
-        //if (req.body.token !== VERIFY_TOKEN) {
-        //return res.sendStatus(401)
-        //}
-        // else
+        var expression = /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi;
+        var regex = new RegExp(expression);
+        var url = req.body.text;
 
-        Slack_ReceiveMooMooCommand(req.body);
+        if (url.match(regex)) {
+            Slack_ReceiveMooMooCommand(req.body);
+            res.end();
+        } else {
+            res.send('please enter valid URL');
+        }
 
-        res.end();
+
+
+
+
 
 
 
