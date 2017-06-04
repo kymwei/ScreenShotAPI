@@ -15,6 +15,12 @@ var token = slackToken.SlackCredentials.token;
 var WebClient = require('@slack/client').WebClient;
 var web = new WebClient(token);
 
+//var IncomingWebhook = require('@slack/client').IncomingWebhook;
+
+//var url = process.env.SLACK_WEBHOOK_URL || ''; //see section above on sensitive data
+
+//var webhook = new IncomingWebhook(url);
+
 var BroserStack_SubmitJob = 'http://www.chefmoomoo.com:300/SubmitJob';
 var BrowserStack_JobComplete = 'http://www.chefmoomoo.com:1234/BrowserStack_JobComplete';
 
@@ -78,21 +84,62 @@ function getMessageCardAttachments() {
 function generateCardMessage(){
     var message = {
         token: token,
-        channel: "general",
-        attachments: JSON.stringify(getMessageCardAttachments()),
-        text: "What platforms would you like to get screenshots for?"
+       channel: "general",
+       attachments: JSON.stringify(getMessageCardAttachments()),
+       text: "What platforms would you like to get screenshots for?"
     };
     return message;
 }
 
 // receive command from slack app, cmd is cmd parameters in json format
+//https://api.slack.com/docs/message-guidelines
+
 function Slack_ReceiveMooMooCommand(data){
     console.log('MooMoo Command Received From Slack');
     console.log('Sending Card Message');
-    console.log(JSON.stringify(generateCardMessage()));
+    //console.log(JSON.stringify(generateCardMessage()));
     console.log('Card Message Sent');
+    var json = generateCardMessage();
+    var attachemntData = [
+        {
+            "text": "Platforms",
+            "fallback": "You are unable to choose a platform",
+            "callback_id": "platforms",
+            "color": "#3AA3E3",
+            "attachment_type": "default",
+            "actions": [
+            {
+                "name": "All",
+                "text": "All",
+                "type": "button",
+                "value": "all",
+                "style": "danger"
+            },
+            {
+                "name": "Desktop",
+                "text": "Desktop",
+                "type": "button",
+                "value": "desktop"
+            },
+            {
+                "name": "Tablet",
+                "text": "Tablet",
+                "type": "button",
+                "value": "tablet"
+            },
+            {
+                "name": "Smartphone",
+                "text": "Smartphone",
+                "type": "button",
+                "value": "smartphone"
+            }
+
+        ]
+        }
+    ]
+
     // we got a /moomoo command, save the urls and the command origin for reference
-    web.chat
+    web.chat.postMessage(json.channel, json.text, {attachments: attachemntData });
     // and send the user a card asking for which platforms to test
 }
 
@@ -137,7 +184,9 @@ app.route('/slack_messageoptions')
 app.route('/slack_messageaction')
     .post(bodyParser.urlencoded({ extended: true }), function (req, res) {
         console.log('slack_messageaction');
-        console.log(req.body);
+        var playload = JSON.parse(req.body.payload);
+        console.log(playload);
+        res.send('Awesome, let test ' + playload.actions[0].name +' :heart_eyes_cat:')
     })
 
 // browserstack will call back to this function when it's done generating screenshots
@@ -163,6 +212,7 @@ app.route('/slack_moomoo')
         // else
 
         Slack_ReceiveMooMooCommand(req.body);
+
         res.end();
 
 
