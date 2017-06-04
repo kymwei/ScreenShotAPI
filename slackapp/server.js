@@ -63,11 +63,11 @@ function getMessageCardAttachments(url) {
     return attachments;
 }
 
-function generateCardMessage(){
+function generateCardMessage(url){
     var message = {
         token: token,
         channel: "general",
-        text : ' '
+        text : url
     };
     return message;
 }
@@ -86,24 +86,24 @@ function Slack_ReceiveMooMooCommand(data){
     } else {
         console.log('MooMoo Command Received From Slack');
         console.log('Sending Card Message');
+        Slack_SendMessageCard(data.text);
         console.log('Card Message Sent');
-        var json = generateCardMessage();
-        var attachmentData = getMessageCardAttachments(data.text);
 
-        // we got a /moomoo command, save the urls and the command origin for reference
-        web.chat.postMessage(json.channel, json.text, {attachments: attachmentData });
         // and send the user a card asking for which platforms to test
     }
 }
 
 // sends the message card to user asking them what browsers they want to generate screenshot in
-function Slack_SendMessageCard(user) {
-    // ask user what they want the screenshots in.
-    // options are: "Desktop, Smartphone, Tablet, All"
+function Slack_SendMessageCard(url) {
+    var json = generateCardMessage(url);
+    var attachmentData = getMessageCardAttachments(url);
+    web.chat.postMessage(json.channel, json.text, {attachments: attachmentData });
 }
 
 // this function receives the response from the slack message card
-function Slack_ReceiveMessageCard(platform) {
+function Slack_ReceiveMessageCard(payload) {
+    console.log('Slack_ReceiveMessageCard');
+    console.log(payload);
     // submit the listed urls to browserstack with the specified platforms
     // desktop, smartphone, tablet, or all
     // use BrowserStack_JobComplete as a callback url
@@ -115,14 +115,10 @@ function Slack_ReceiveMessageCard(platform) {
 // slack_messageaction
 //https://api.slack.com/interactive-messages#responding
 app.route('/slack_messageaction')
-    .get(function (req, res) {
-        res.sendStatus(200)
-    })
     .post(bodyParser.urlencoded({ extended: true }), function (req, res) {
-        console.log('slack_messageaction');
-        var playload = JSON.parse(req.body.payload);
-        console.log(playload);
-        res.send('Awesome, let\'s test ' + playload.actions[0].name +' for '+ JSON.parse(playload.actions[0].value).url + ' :heart_eyes_cat:')
+        var payload = JSON.parse(req.body.payload);
+        Slack_ReceiveMessageCard(payload)
+        res.send('Awesome, let\'s get ' + JSON.parse(payload.actions[0].value).platform +' screenshots for '+ JSON.parse(payload.actions[0].value).url + ' :heart_eyes_cat:');
     })
 
 // browserstack will call back to this function when it's done generating screenshots
