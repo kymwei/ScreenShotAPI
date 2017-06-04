@@ -8,85 +8,66 @@ var express = require('express'),
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-
 var request = require('request');
 var slackToken = require("./SlackCredentials.js");
 var token = slackToken.SlackCredentials.token;
 var WebClient = require('@slack/client').WebClient;
 var web = new WebClient(token);
 
-//var IncomingWebhook = require('@slack/client').IncomingWebhook;
-
-//var url = process.env.SLACK_WEBHOOK_URL || ''; //see section above on sensitive data
-
-//var webhook = new IncomingWebhook(url);
-
 var BroserStack_SubmitJob = 'http://www.chefmoomoo.com:300/SubmitJob';
 var BrowserStack_JobComplete = 'http://www.chefmoomoo.com:1234/BrowserStack_JobComplete';
 
-/*
-This json is from the following url
- https://api.slack.com/docs/messages/builder?msg=%7B%22text%22%3A%22What%20platforms%20would%20you%20like%20to%20get%20screenshots%20for%3F%22%2C%22attachments%22%3A%5B%7B%22text%22%3A%22Platforms%22%2C%22callback_id%22%3A%22platforms%22%2C%22color%22%3A%22%233AA3E3%22%2C%22attachment_type%22%3A%22default%22%2C%22actions%22%3A%5B%7B%22name%22%3A%22All%22%2C%22text%22%3A%22All%22%2C%22type%22%3A%22button%22%2C%22value%22%3A%22all%22%7D%2C%7B%22name%22%3A%22Desktop%22%2C%22text%22%3A%22Desktop%22%2C%22type%22%3A%22button%22%2C%22value%22%3A%22desktop%22%7D%2C%7B%22name%22%3A%22Tablet%22%2C%22text%22%3A%22Tablet%22%2C%22type%22%3A%22button%22%2C%22value%22%3A%22tablet%22%7D%2C%7B%22name%22%3A%22Smartphone%22%2C%22text%22%3A%22Smartphone%22%2C%22type%22%3A%22button%22%2C%22value%22%3A%22smartphone%22%7D%5D%7D%5D%7D
- */
-function getMessageCardJson() {
-    var card = new Object();
-    card.text = "What platforms would you like to get screenshots for?";
-    card.attachments = getMessageCardAttachments();
-
-    return JSON.stringify(card);
-}
-
-function getMessageCardAttachments() {
-    var attachments = new Object();
-    attachments.title = "Platforms";
-    attachments.fallback = 'platforms'
-    attachments.callback_id = "platforms";
-    attachments.attachment_type = "default";
-
-    var allAction = new Object();
-    allAction.name =  "All";
-    allAction.text  = "All";
-    allAction.type = "button";
-    allAction.value = "all";
-
-    var desktopAction = new Object();
-    desktopAction.name =  "Desktop";
-    desktopAction.text  = "Desktop";
-    desktopAction.type = "button";
-    allAction.value = "desktop";
-
-    var tabletAction = new Object();
-    tabletAction.name =  "Tablet";
-    tabletAction.text  = "Tablet";
-    tabletAction.type = "button";
-    tabletAction.value = "tablet";
-
-    var smartphoneAction = new Object();
-    smartphoneAction.name =  "Smartphone";
-    smartphoneAction.text  = "Smartphone";
-    smartphoneAction.type = "button";
-    smartphoneAction.value = "smartphone";
-
-    attachments.actions = [];
-    attachments.actions.push(allAction);
-    attachments.actions.push(desktopAction);
-    attachments.actions.push(tabletAction);
-    attachments.actions.push(smartphoneAction);
+function getMessageCardAttachments(url) {
+    var attachments = [
+        {
+            "text": "Select the platforms to get screenshots",
+            "fallback": "You are unable to choose a platform",
+            "callback_id": "platforms",
+            "actions": [
+                {
+                    "name": "All",
+                    "text": "All",
+                    "type": "button",
+                    "value": JSON.stringify({platform:"all",url:url}),
+                    "style": "primary"
+                },
+                {
+                    "name": "Desktop",
+                    "text": "Desktop",
+                    "type": "button",
+                    "value": JSON.stringify({platform:"desktop",url:url})
+                },
+                {
+                    "name": "Tablet",
+                    "text": "Tablet",
+                    "type": "button",
+                    "value": JSON.stringify({platform:"tablet",url:url})
+                },
+                {
+                    "name": "Smartphone",
+                    "text": "Smartphone",
+                    "type": "button",
+                    "value": JSON.stringify({platform:"smartphone",url:url})
+                },
+                {
+                    "name": "Cancel",
+                    "text": "Cancel",
+                    "type": "button",
+                    "value": JSON.stringify({platform:"none",url:url}),
+                    "style": "danger"
+                }
+            ]
+        }
+    ]
 
     return attachments;
 }
 
-/* save working attachments
-
- [{"fallback":"Platforms","text":"Platforms","callback_id":"platforms","actions":[{"name":"platform","text":"All","type":"button","value":"all"},{"name":"platform","text":"Desktop","type":"button","value":"desktop"},{"name":"platform","text":"Tablet","type":"button","value":"tablet"},{"name":"platform","text":"Smartphone","type":"button","value":"smartphone"}]}]
- */
-
 function generateCardMessage(){
     var message = {
         token: token,
-       channel: "general",
-       attachments: JSON.stringify(getMessageCardAttachments()),
-       text: "What platforms would you like to get screenshots for?"
+        channel: "general",
+        text : ' '
     };
     return message;
 }
@@ -95,59 +76,24 @@ function generateCardMessage(){
 //https://api.slack.com/docs/message-guidelines
 
 function Slack_ReceiveMooMooCommand(data){
-    console.log('MooMoo Command Received From Slack');
-    console.log('Sending Card Message');
-    //console.log(JSON.stringify(generateCardMessage()));
-    console.log('Card Message Sent');
-    var json = generateCardMessage();
-    var attachemntData = [
-        {
-            "text": "Platforms",
-            "fallback": "You are unable to choose a platform",
-            "callback_id": "platforms",
-            "color": "#7CD197",
-            "attachment_type": "default",
-            "actions": [
-            {
-                "name": "All",
-                "text": "All",
-                "type": "button",
-                "value": JSON.stringify({platform:"all",url:data.text}),
-                "style": "primary"
-            },
-            {
-                "name": "Desktop",
-                "text": "Desktop",
-                "type": "button",
-                "value": JSON.stringify({platform:"desktop",url:data.text})
-            },
-            {
-                "name": "Tablet",
-                "text": "Tablet",
-                "type": "button",
-                "value": JSON.stringify({platform:"tablet",url:data.text})
-            },
-            {
-                "name": "Smartphone",
-                "text": "Smartphone",
-                "type": "button",
-                "value": JSON.stringify({platform:"smartphone",url:data.text})
-            },
-            {
-                "name": "Cancel",
-                "text": "Cancel",
-                "type": "button",
-                "value": JSON.stringify({platform:"no",url:data.text}),
-                "style": "danger"
-            }
+    console.log(data);
+    var expression = /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi;
+    var regex = new RegExp(expression);
+    var url = data.text;
 
-        ]
-        }
-    ]
+    if (!url.match(regex)) {
+        web.chat.postMessage(data.channel_id, 'please enter a valid URL');
+    } else {
+        console.log('MooMoo Command Received From Slack');
+        console.log('Sending Card Message');
+        console.log('Card Message Sent');
+        var json = generateCardMessage();
+        var attachmentData = getMessageCardAttachments(data.text);
 
-    // we got a /moomoo command, save the urls and the command origin for reference
-    web.chat.postMessage(json.channel, json.text, {attachments: attachemntData });
-    // and send the user a card asking for which platforms to test
+        // we got a /moomoo command, save the urls and the command origin for reference
+        web.chat.postMessage(json.channel, json.text, {attachments: attachmentData });
+        // and send the user a card asking for which platforms to test
+    }
 }
 
 // sends the message card to user asking them what browsers they want to generate screenshot in
@@ -165,31 +111,13 @@ function Slack_ReceiveMessageCard(platform) {
 }
 
 /// Routes ///
-// slack_messageoptions
-app.route('/slack_messageoptions')
-    .post(bodyParser.urlencoded({ extended: true }), function (req, res) {
-        console.log('slack_messageoptions');
-        console.log(req.body);
-
-        menu_options = {
-            "options": [
-                {
-                    "text": "Chess",
-                    "value": "chess"
-                },
-                {
-                    "text": "Global Thermonuclear War",
-                    "value": "war"
-                }
-            ]
-        }
-
-        res.json(menu_options);
-    })
 
 // slack_messageaction
 //https://api.slack.com/interactive-messages#responding
 app.route('/slack_messageaction')
+    .get(function (req, res) {
+        res.sendStatus(200)
+    })
     .post(bodyParser.urlencoded({ extended: true }), function (req, res) {
         console.log('slack_messageaction');
         var playload = JSON.parse(req.body.payload);
@@ -214,53 +142,8 @@ app.route('/slack_moomoo')
         res.sendStatus(200)
     })
     .post(bodyParser.urlencoded({ extended: true }), function (req, res) {
-        var expression = /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi;
-        var regex = new RegExp(expression);
-        var url = req.body.text;
-
-        if (url.match(regex)) {
-            Slack_ReceiveMooMooCommand(req.body);
-            res.end();
-        } else {
-            res.send('please enter valid URL');
-        }
-
-
-
-
-
-
-
-
-        /*
-         .post(bodyParser.urlencoded({ extended: true }), function (req, res) {
-         //if (req.body.token !== VERIFY_TOKEN) {
-         //return res.sendStatus(401)
-         //}
-
-         var url = req.body.text;
-         var user = req.body.user_name;
-         var message = 'Requested by ' + user + '.  Generating screenshots for: ' + url;
-
-         console.log(req.body);
-
-         res.json({
-         response_type: 'in_channel',
-         text: message
-         })
-
-         // post to browserStackGenerateScreenShotEndPoint
-         request.post(
-         browserStackGenerateScreenShotEndPoint,
-         { json: { url: url, username: user, timestamp: new Date().getTime() } },
-         function (error, response, body) {
-         if (!error && response.statusCode == 200) {
-         console.log(body);
-         }
-         }
-         );
-         })
-         */
+        Slack_ReceiveMooMooCommand(req.body);
+        res.end();
     })
 
 app.listen(port, function (err) {
