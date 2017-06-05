@@ -15,7 +15,7 @@ var WebClient = require('@slack/client').WebClient;
 var web = new WebClient(token);
 var screenshotsChannel = 'general';
 
-var BrowserStack_SubmitJobUrl = 'http://736d28d7.ngrok.io/submitjob';
+var BrowserStack_SubmitJobUrl = 'http://www.chefmoomoo.com:300/submitjob';
 
 function getMessageCardAttachments(url) {
     var attachments = [

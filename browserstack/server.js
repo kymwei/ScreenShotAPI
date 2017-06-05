@@ -11,7 +11,7 @@ var BrowserStackCredentials = require("./BrowserStackCredentials.js");
 var screenshotClient = BrowserStack.createScreenshotClient(BrowserStackCredentials.BrowserStackCredentials());
 var restClient = BrowserStack.createClient(BrowserStackCredentials.BrowserStackCredentials());
 
-var BrowserStack_JobCompleteUrl = 'http://bc073371.ngrok.io/browserstack_jobcomplete';
+var BrowserStack_JobCompleteUrl = 'http://www.chefmoomoo.com:1234/browserstack_jobcomplete';
 var url = '';
 var platform = '';
 
