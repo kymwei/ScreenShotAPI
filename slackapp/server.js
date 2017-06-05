@@ -106,9 +106,44 @@ function Slack_ReceiveMessageCard(data) {
 }
 
 function BrowserStack_JobComplete(data) {
-    var channel = screenshotsChannel;
+    var callbackUrl = data.callback_url;
+    // parse the platform out of the callback url, should be in the qs platform
+    var queryString = callbackUrl.split('?')[1];
+    console.log('queryString: ' + queryString);
+    var keyValues =  queryString.split('&');
+    console.log('keyValues: ' +keyValues);
+    var platform = '';
+    for(var i = 0; i < keyValues.length; i++) {
+        if(keyValues[i].split('=')[0] == 'platform'){
+            platform = keyValues[i].split('=')[1];
+        }
+    }
+
     var message = 'Screenshots for ' + data.screenshots[0].url + ' are here: ' + data.zipped_url;
+    switch (platform) {
+        case 'all':
+            message = 'screenshots for all platforms for ' + data.screenshots[0].url + ' are here: ' + data.zipped_url;
+            break;
+        default:
+            message = platform + ' screenshots for ' + data.screenshots[0].url + ' are here: ' + data.zipped_url;
+            break;
+    }
+    var channel = screenshotsChannel;
+
     web.chat.postMessage(channel, message);
+}
+
+function GetCardResponseMessage(platform, url) {
+    var message = 'screenshots submitted';
+    switch(platform){
+        case "all":
+            message = 'Awesome, let\'s get screenshots for all platforms for ' + url + '.  Your screenshots will be posted in channel: #' + screenshotsChannel + ' :heart_eyes_cat:';
+            break;
+        default:
+            message = 'Awesome, let\'s get ' + platform +' screenshots for ' + url + '.  Your screenshots will be posted in channel: #' + screenshotsChannel + ' :heart_eyes_cat:';
+            break;
+    }
+    return message;
 }
 
 /// Routes ///
@@ -118,8 +153,11 @@ function BrowserStack_JobComplete(data) {
 app.route('/slack_messageaction')
     .post(bodyParser.urlencoded({ extended: true }), function (req, res) {
         var payload = JSON.parse(req.body.payload);
-        Slack_ReceiveMessageCard(payload)
-        res.send('Awesome, let\'s get ' + JSON.parse(payload.actions[0].value).platform +' screenshots for '+ JSON.parse(payload.actions[0].value).url + '.  Your screenshots will be posted in channel: #' + screenshotsChannel + ' :heart_eyes_cat:');
+        Slack_ReceiveMessageCard(payload);
+        var platform =  JSON.parse(payload.actions[0].value).platform;
+        var url = JSON.parse(payload.actions[0].value).url;
+        var message = GetCardResponseMessage(platform, url);
+        res.send(message);
     })
 
 // browserstack will call back to this function when it's done generating screenshots

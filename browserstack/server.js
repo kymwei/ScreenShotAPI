@@ -48,7 +48,6 @@ function SubmitJobToBrowserStack(qs) {
 }
 
 function getBrowsers_callback(error, browsers) {
-    console.log('get browsers');
     var browsersToScreenshot;
     switch (platform) {
         case 'desktop':
@@ -69,13 +68,12 @@ function getBrowsers_callback(error, browsers) {
         return false;
     }
     else {
-        console.log('browsers found');
 
         var options = {};
         options.browsers = browsersToScreenshot;
         options.url = url;
         options.local = true;
-        options.callback_url = BrowserStack_JobCompleteUrl;
+        options.callback_url = BrowserStack_JobCompleteUrl + '?platform=' + platform;
 
         screenshotClient.generateScreenshots(options, function (error, job) {
             if (error) {
@@ -178,9 +176,10 @@ function getLatest_Smartphone_IOS_Browser(allBrowsers) {
 }
 
 function getLatest_Smartphone_Android_Browser(allBrowsers) {
-    // filter for Samsung Galaxy but exclude Samsung Galaxy Tab and Mini
+    // filter for Samsung Galaxy but exclude Samsung Galaxy Tab and Mini and Note
     var smartPhoneAndroidBrowsers = allBrowsers.filter(function(browser){
-        return browser.device != null && browser.device.indexOf('Samsung Galaxy') > -1 && browser.device.indexOf('Tab') == -1  && browser.device.indexOf('Mini') == -1
+        return browser.device != null && browser.device.indexOf('Samsung Galaxy') > -1
+            && browser.device.indexOf('Tab') == -1 && browser.device.indexOf('Mini') == -1 && browser.device.indexOf('Note') == -1
     });
 
     // sort by device, this will hopefully get us the latest Samsung Galaxy release at the end of the array
