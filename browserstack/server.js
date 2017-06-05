@@ -11,36 +11,82 @@ var BrowserStackCredentials = require("./BrowserStackCredentials.js");
 var screenshotClient = BrowserStack.createScreenshotClient(BrowserStackCredentials.BrowserStackCredentials());
 var restClient = BrowserStack.createClient(BrowserStackCredentials.BrowserStackCredentials());
 
+var BrowserStack_JobCompleteUrl = 'http://bc073371.ngrok.io/browserstack_jobcomplete';
+var url = '';
+var platform = '';
+
 var websiteUrl = "https://www.google.com";
 
-function SubmitJobToBrowserStack(data) {
-    // data should contain the screenshot urls, the browser array, and the callback url
-    // submit these details to browserstack
-
-    /*var options = {};
-    options.browsers = browsersToScreenshot;
-    options.url = url;
-    options.local = true;
-    options.user_id = user_id;
-
-    // use screenshot api
-    //res.json(user_id + 'screen for ' + url +' is processing' + job.job_id);
-    console.log("send job to browserstack for url: " + options.url);
-    screenshotClient.generateScreenshots(options, function(error, job){
-        if(error) {
-
-        }else{
-            res.json({
-                userId: user_id,
-                url: url,
-                jobid: job.job_id
-            })
-            getScreenShot = setInterval(function() {
-                    screenshotClient.getJob(job.job_id, screenShotJobCallcallback)
-                }
-                , 3000);
+function ExtractUrlAndPlatformFromQS(qs){
+    var splitQS = qs.split('&');
+    for(var i = 0; i < splitQS.length; i++){
+        var keyValue = splitQS[i].split('=');
+        switch(keyValue[0]){
+            case 'url':
+                url = keyValue[1];
+                break;
+            case 'platform':
+                platform = keyValue[1];
+                break;
         }
-    });*/
+    }
+    if(url == '' || platform == '') {
+        return false;
+    }
+    return true;
+}
+
+function SubmitJobToBrowserStack(qs) {
+    if(!ExtractUrlAndPlatformFromQS(qs)) {
+        return false;
+    }
+    else {
+        screenshotClient.getBrowsers(getBrowsers_callback);
+        return true;
+    }
+    return false;
+}
+
+function getBrowsers_callback(error, browsers) {
+    console.log('get browsers');
+    var browsersToScreenshot;
+    switch (platform) {
+        case 'desktop':
+            browsersToScreenshot = getDesktopBrowsers(browsers);
+            break;
+        case 'tablet':
+            browsersToScreenshot = getTabletBrowsers(browsers);
+            break;
+        case 'smartphone':
+            browsersToScreenshot = getSmartphoneBrowsers(browsers);
+            break;
+        case 'all':
+            browsersToScreenshot = getAllPlatormBrowsers(browsers);
+            break;
+    }
+    if (!browsersToScreenshot) {
+        console.log('no browsers to screenshot');
+        return false;
+    }
+    else {
+        console.log('browsers found');
+
+        var options = {};
+        options.browsers = browsersToScreenshot;
+        options.url = url;
+        options.local = true;
+        options.callback_url = BrowserStack_JobCompleteUrl;
+
+        screenshotClient.generateScreenshots(options, function (error, job) {
+            if (error) {
+                
+            } else {
+
+            }
+        });
+
+        return true;
+    }
 }
 
 function getAllPlatormBrowsers(){
@@ -96,14 +142,12 @@ function getSmartphoneBrowsers(allBrowsers){
     return browsers;
 }
 
-
-//TODO: Ray substruck plus from here
 function getLatest_Smartphone_IOS_Browser(iosBrowsers) {
     var browserList = iosBrowsers.filter(function(browser){
         return browser.device.includes('iPhone');
     });
 
-    var newList=  browserList.sort(function(a, b){
+    var newList = browserList.sort(function(a, b){
         return a.device > b.device? 1: -1;
     });
     return newList[newList.length-1]
@@ -176,22 +220,25 @@ app.route('/browser')
     })
 
 /// Routes ///
-// this is the route to receive the job from the server, the job receiver is get only
-app.route('/SubmitJob')
+// this is the route to receive the job from the slack app, the job receiver is get only
+app.route('/submitjob')
     .get(bodyParser.urlencoded({ extended: true }), function (req, res) {
-        onsole.log('Browserstack SubmitJob');
-        console.log(req.body);
-        // receive url for file containing job details
-        // file should have job details (urls, browser, callback url)
-        // submit job to browserstack with given callback
+        console.log('job received');
+        if(SubmitJobToBrowserStack(req._parsedUrl.query)) {
+            console.log('submit job is ok');
+            res.sendStatus(200);
+        }
+        else {
+            console.log('submit job is bad');
+            res.sendStatus(500);
+        }
+
     })
-
-
 
 app.listen(port, function (err) {
     if (err) {
         return console.error('Error starting server: ', err)
     }
-    console.log('Slack Server successfully started on port %s', port)
+    console.log('BrowserStack Server successfully started on port %s', port)
 })
 /// End Routes ///

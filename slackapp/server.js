@@ -13,9 +13,9 @@ var slackToken = require("./SlackCredentials.js");
 var token = slackToken.SlackCredentials.token;
 var WebClient = require('@slack/client').WebClient;
 var web = new WebClient(token);
+var screenshotsChannel = 'general';
 
-var BroserStack_SubmitJob = 'http://www.chefmoomoo.com:300/SubmitJob';
-var BrowserStack_JobComplete = 'http://www.chefmoomoo.com:1234/BrowserStack_JobComplete';
+var BrowserStack_SubmitJobUrl = 'http://736d28d7.ngrok.io/submitjob';
 
 function getMessageCardAttachments(url) {
     var attachments = [
@@ -25,32 +25,32 @@ function getMessageCardAttachments(url) {
             "callback_id": "platforms",
             "actions": [
                 {
-                    "name": "All",
+                    "name": "platform",
                     "text": "All",
                     "type": "button",
                     "value": JSON.stringify({platform:"all",url:url}),
                     "style": "primary"
                 },
                 {
-                    "name": "Desktop",
+                    "name": "platform",
                     "text": "Desktop",
                     "type": "button",
                     "value": JSON.stringify({platform:"desktop",url:url})
                 },
                 {
-                    "name": "Tablet",
+                    "name": "platform",
                     "text": "Tablet",
                     "type": "button",
                     "value": JSON.stringify({platform:"tablet",url:url})
                 },
                 {
-                    "name": "Smartphone",
+                    "name": "platform",
                     "text": "Smartphone",
                     "type": "button",
                     "value": JSON.stringify({platform:"smartphone",url:url})
                 },
                 {
-                    "name": "Cancel",
+                    "name": "platform",
                     "text": "Cancel",
                     "type": "button",
                     "value": JSON.stringify({platform:"none",url:url}),
@@ -63,20 +63,17 @@ function getMessageCardAttachments(url) {
     return attachments;
 }
 
-function generateCardMessage(url){
+function generateCardMessage(url, channel){
     var message = {
         token: token,
-        channel: "general",
+        channel: channel,
         text : url
     };
     return message;
 }
 
-// receive command from slack app, cmd is cmd parameters in json format
-//https://api.slack.com/docs/message-guidelines
-
+// handle the moo moo command from slack
 function Slack_ReceiveMooMooCommand(data){
-    console.log(data);
     var expression = /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi;
     var regex = new RegExp(expression);
     var url = data.text;
@@ -84,30 +81,34 @@ function Slack_ReceiveMooMooCommand(data){
     if (!url.match(regex)) {
         web.chat.postMessage(data.channel_id, 'please enter a valid URL');
     } else {
-        console.log('MooMoo Command Received From Slack');
-        console.log('Sending Card Message');
-        Slack_SendMessageCard(data.text);
-        console.log('Card Message Sent');
-
-        // and send the user a card asking for which platforms to test
+        Slack_SendMessageCard(data.text, data.channel_id);
     }
 }
 
-// sends the message card to user asking them what browsers they want to generate screenshot in
-function Slack_SendMessageCard(url) {
-    var json = generateCardMessage(url);
+// sends the message card to user asking them what browsers they want to generate screenshot
+function Slack_SendMessageCard(url, channel) {
+    var json = generateCardMessage(url, channel);
     var attachmentData = getMessageCardAttachments(url);
     web.chat.postMessage(json.channel, json.text, {attachments: attachmentData });
 }
-
 // this function receives the response from the slack message card
-function Slack_ReceiveMessageCard(payload) {
-    console.log('Slack_ReceiveMessageCard');
-    console.log(payload);
-    // submit the listed urls to browserstack with the specified platforms
-    // desktop, smartphone, tablet, or all
-    // use BrowserStack_JobComplete as a callback url
+function Slack_ReceiveMessageCard(data) {
+    var platform = JSON.parse(data.actions[0].value).platform;
+    var url = JSON.parse(data.actions[0].value).url;
 
+    var browserStackSubmitJobUrl = BrowserStack_SubmitJobUrl + "?platform=" + platform + "&url=" + url;
+    console.log('submitting job to browserstack service: ' + browserStackSubmitJobUrl);
+    request({
+        url: browserStackSubmitJobUrl
+    }, function (error, response, body) {
+        console.log('slack service: browserstack job submitted');
+    })
+}
+
+function BrowserStack_JobComplete(data) {
+    var channel = screenshotsChannel;
+    var message = 'Screenshots for ' + data.screenshots[0].url + ' are here: ' + data.zipped_url;
+    web.chat.postMessage(channel, message);
 }
 
 /// Routes ///
@@ -118,18 +119,13 @@ app.route('/slack_messageaction')
     .post(bodyParser.urlencoded({ extended: true }), function (req, res) {
         var payload = JSON.parse(req.body.payload);
         Slack_ReceiveMessageCard(payload)
-        res.send('Awesome, let\'s get ' + JSON.parse(payload.actions[0].value).platform +' screenshots for '+ JSON.parse(payload.actions[0].value).url + ' :heart_eyes_cat:');
+        res.send('Awesome, let\'s get ' + JSON.parse(payload.actions[0].value).platform +' screenshots for '+ JSON.parse(payload.actions[0].value).url + '.  Your screenshots will be posted in channel: #' + screenshotsChannel + ' :heart_eyes_cat:');
     })
 
 // browserstack will call back to this function when it's done generating screenshots
 app.route('/browserstack_jobcomplete')
-    .get(function (req, res) {
-        res.sendStatus(200)
-    })
     .post(bodyParser.urlencoded({ extended: true }), function (req, res) {
-        console.log('Browserstack Job Complete');
-        console.log(req.body);
-        // post the screenshot urls back to the channel
+        BrowserStack_JobComplete(req.body);
     })
 
 // Slack moomoo command receiver
