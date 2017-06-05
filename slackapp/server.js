@@ -137,13 +137,26 @@ function GetCardResponseMessage(platform, url) {
     var message = 'screenshots submitted';
     switch(platform){
         case "all":
-            message = 'Awesome, let\'s get screenshots for all platforms for ' + url + '.  Your screenshots will be posted in channel: #' + screenshotsChannel + ' :heart_eyes_cat:';
+            message = 'Getting screenshots for all platforms for ' + url + '. ' + GetRandomCatMessage();
             break;
         default:
-            message = 'Awesome, let\'s get ' + platform +' screenshots for ' + url + '.  Your screenshots will be posted in channel: #' + screenshotsChannel + ' :heart_eyes_cat:';
+            message = 'Getting ' + platform + ' screenshots for ' + url + '. ' + GetRandomCatMessage();
             break;
     }
     return message;
+}
+
+function GetRandomCatMessage() {
+        var msgs = [];
+        msgs.push('Your screenshots will be posted in #' + screenshotsChannel + ' in a meow-ment.');
+        msgs.push('Please wait a meow-ment, your screenshots will be posted in #' + screenshotsChannel + '.');
+        msgs.push('Your screenshots will be posted in #' + screenshotsChannel + ' purr-ty soon.');
+        msgs.push('Head over to #' + screenshotsChannel + ' for your paw-some screenshots.');
+
+        var index =  Math.floor(Math.random() * msgs.length);
+        console.log(index);
+
+        return(msgs[index]);
 }
 
 /// Routes ///
