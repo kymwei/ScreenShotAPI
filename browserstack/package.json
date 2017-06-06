@@ -1,0 +1,15 @@
+{
+  "name": "browserstack",
+  "version": "1.0.0",
+  "description": "service to call browserstack api",
+  "main": "BrowserStackService.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "kym",
+  "license": "ISC",
+  "dependencies": {
+    "commander": "^2.9.0"
+  }
+}
