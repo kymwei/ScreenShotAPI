@@ -96,7 +96,7 @@ function Slack_ReceiveMessageCard(data) {
     var platform = JSON.parse(data.actions[0].value).platform;
     var url = JSON.parse(data.actions[0].value).url;
 
-    var browserStackSubmitJobUrl = BrowserStack_SubmitJobUrl + "?platform=" + platform + "&url=" + url;
+    var browserStackSubmitJobUrl = BrowserStack_SubmitJobUrl + "?platform=" + platform + "&url=" + encodeURI(url);
     console.log('submitting job to browserstack service: ' + browserStackSubmitJobUrl);
     request({
         url: browserStackSubmitJobUrl

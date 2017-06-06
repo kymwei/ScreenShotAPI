@@ -21,28 +21,28 @@ const browserstackcmd = require('commander');
 
 var websiteUrl = "https://www.google.com";
 
-function ExtractUrlAndPlatformFromQS(qs){
-    var splitQS = qs.split('&');
-    for(var i = 0; i < splitQS.length; i++){
-        var keyValue = splitQS[i].split('=');
-        switch(keyValue[0]){
-            case 'url':
-                url = keyValue[1];
-                break;
-            case 'platform':
-                platform = keyValue[1];
-                break;
-        }
-    }
-    if(url == '' || platform == '') {
-        return false;
-    }
-    return true;
-}
+// function ExtractUrlAndPlatformFromQS(qs){
+//     var splitQS = qs.split('&');
+//     for(var i = 0; i < splitQS.length; i++){
+//         var keyValue = splitQS[i].split('=');
+//         switch(keyValue[0]){
+//             case 'url':
+//                 url = keyValue[1];
+//                 break;
+//             case 'platform':
+//                 platform = keyValue[1];
+//                 break;
+//         }
+//     }
+//     if(url == '' || platform == '') {
+//         return false;
+//     }
+//     return true;
+// }
 
 function SubmitJobToBrowserStack(qs) {
     if(browserstackcmd.url) {
-        url = browserstackcmd.url;
+        url = decodeURIComponent(browserstackcmd.url);
         platform = browserstackcmd.platform || 'all';
         screenshotClient.getBrowsers(getBrowsers_callback);
     }else{
@@ -220,12 +220,13 @@ function sortByDeviceAlphabetically(a,b) {
 
 browserstackcmd
     .version('0.0.1')
-    .option('-u, --url [string]', 'screenshot URL')
+    .option('-u, --url <url>', 'screenshot URL')
     .option('-p, --platform [string]', 'desktop, smartphone, tablet, all')
     .option('-s, --slacksUser [string]', 'slack user name')
     .option('-v, --view [string]', 'zip, imgurl')
     .parse(process.argv)
 
+console.log(browserstackcmd.url);
 
 if (browserstackcmd.url) {
     SubmitJobToBrowserStack()
