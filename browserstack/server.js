@@ -10,14 +10,16 @@ var BrowserStack = require("browserstack");
 var BrowserStackCredentials = require("./BrowserStackCredentials.js");
 var screenshotClient = BrowserStack.createScreenshotClient(BrowserStackCredentials.BrowserStackCredentials());
 var restClient = BrowserStack.createClient(BrowserStackCredentials.BrowserStackCredentials());
+//var BrowserStack_JobCompleteUrl = 'http://www.chefmoomoo.com:300/browserstack_jobcomplete';
 
-var BrowserStack_JobCompleteUrl = 'http://www.chefmoomoo.com:1234/browserstack_jobcomplete';
+var BrowserStack_JobCompleteUrl = 'https://eab3798e.ngrok.io/browserstack_jobcomplete';
 var url = '';
 var platform = '';
 
 var websiteUrl = "https://www.google.com";
 
 function ExtractUrlAndPlatformFromQS(qs){
+    console.log(qs);
     var splitQS = qs.split('&');
     for(var i = 0; i < splitQS.length; i++){
         var keyValue = splitQS[i].split('=');
@@ -71,10 +73,11 @@ function getBrowsers_callback(error, browsers) {
 
         var options = {};
         options.browsers = browsersToScreenshot;
-        options.url = url;
+        options.url = decodeURIComponent(url);;
         options.local = true;
         options.callback_url = BrowserStack_JobCompleteUrl + '?platform=' + platform;
-
+        console.log(url)
+        console.log(options.url)
         screenshotClient.generateScreenshots(options, function (error, job) {
             if (error) {
 

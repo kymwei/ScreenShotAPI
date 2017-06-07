@@ -78,7 +78,10 @@ function getBrowsers_callback(error, browsers) {
 
         var options = {};
         options.browsers = browsersToScreenshot;
-        options.url = url;
+        console.log('url' + url);
+
+        options.url = decodeURIComponent(url);
+        console.log('urldecode' + options);
         options.local = true;
         options.callback_url = BrowserStack_JobCompleteUrl + '?platform=' + platform;
 
