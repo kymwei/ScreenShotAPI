@@ -34,20 +34,20 @@ function Slack_ReceiveMooMooCommand(data){
     var expression = /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi;
     var regex = new RegExp(expression);
     var url = data.text;
-    console.log('a' + data.channel_id)
+
     if (!url.match(regex)) {
         web.chat.postMessage(data.channel_id, 'please enter a valid URL');
     } else {
-        Slack_SendMessageCard((data.text), data.channel_id);
+        Slack_SendMessageCard(data);
     }
 }
 
 // sends the message card to user asking them what browsers they want to generate screenshot
-function Slack_SendMessageCard(url, channel) {
-    var json = generateCardMessage(url, channel);
-    console.log(channel)
-    var attachmentData = attachments.cards.platformAttachments(url);
-    web.chat.postMessage(json.channel, json.text, {attachments: attachmentData });
+function Slack_SendMessageCard(data) {
+    var json = generateCardMessage(data.text, data.channel_id, data.user_name);
+
+    var attachmentData = attachments.cards.platformAttachments(data.text, data.user_name);
+    web.chat.postMessage(data.channel_id, '', {attachments: attachmentData });
 }
 // this function receives the response from the slack message card
 function Slack_ReceiveMessageCard(action) {
@@ -55,14 +55,14 @@ function Slack_ReceiveMessageCard(action) {
 
     //var url = JSON.parse(action.value).url;
 
-    var browserStackSubmitJobUrl = BrowserStack_SubmitJobUrl + "?platform=" + actionJson.platform + "&url=" + encodeURIComponent(actionJson.url);
+    var browserStackSubmitJobUrl = BrowserStack_SubmitJobUrl + "?platform=" + actionJson.platform + "&user=" + actionJson.user + "&url=" + encodeURIComponent(actionJson.url);
     console.log('submitting job to browserstack service: ' + browserStackSubmitJobUrl);
 
-    // request({
-    //     url: browserStackSubmitJobUrl
-    // }, function (error, response, body) {
-    //     console.log('slack service: browserstack job submitted', error);
-    // })
+    request({
+        url: browserStackSubmitJobUrl
+    }, function (error, response, body) {
+        console.log('slack service: browserstack job submitted', error);
+    })
 }
 
 function BrowserStack_JobComplete(data) {
@@ -74,35 +74,47 @@ function BrowserStack_JobComplete(data) {
     var keyValues =  queryString.split('&');
     //console.log('keyValues: ' +keyValues);
     var platform = '';
+    var user = '';
     for(var i = 0; i < keyValues.length; i++) {
-        if(keyValues[i].split('=')[0] == 'platform'){
-            platform = keyValues[i].split('=')[1];
+
+        var keyValue = keyValues[i].split('=');
+        switch(keyValue[0]){
+
+            case 'platform':
+                platform = keyValue[1];
+                break;
+            case 'user':
+                user = keyValue[1];
+                break;
         }
+
     }
     var url = decodeURIComponent(data.screenshots[0].url);
     var message = 'Screenshots for ' + url + ' are here: ' + data.zipped_url;
     switch (platform) {
         case 'all':
-            message = 'screenshots for all platforms for ' + url + ' are here: ' + data.zipped_url;
+            message = '@' + user + ' screenshots for all platforms for \n' + url + '\n zip file are here: ' + data.zipped_url;
             break;
         default:
-            message = platform + ' screenshots for ' + url + ' are here: ' + data.zipped_url;
+            message = '@' + user + ' ' + platform + ' screenshots for \n' + url + '\n are here: ' + data.zipped_url;
             break;
     }
     var channel = screenshotsChannel;
 
     web.chat.postMessage(channel, message);
-   // web.chat.postMessage(channel, json.text, {attachments: attachmentData });
+    //TODO: list time out device
+    //TODO: ask user if want to display more
+    web.chat.postMessage(channel, '', {attachments: attachments.cards.dislpaySreenShot('test') });
 }
 
 function GetCardResponseMessage(platform, url) {
     var message = 'screenshots submitted';
     switch(platform){
         case "all":
-            message = 'Getting screenshots for all platforms for ' + decodeURIComponent(url) + '. ' + GetRandomCatMessage();
+            message = 'Getting screenshots for all platforms for \n' + decodeURIComponent(url) + '. \n' + GetRandomCatMessage();
             break;
         default:
-            message = 'Getting ' + platform + ' screenshots for ' + decodeURIComponent(url) + '. ' + GetRandomCatMessage();
+            message = 'Getting ' + platform + ' screenshots for \n' + decodeURIComponent(url) + '. \n' + GetRandomCatMessage();
             break;
     }
     return message;

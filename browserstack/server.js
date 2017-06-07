@@ -12,9 +12,10 @@ var screenshotClient = BrowserStack.createScreenshotClient(BrowserStackCredentia
 var restClient = BrowserStack.createClient(BrowserStackCredentials.BrowserStackCredentials());
 //var BrowserStack_JobCompleteUrl = 'http://www.chefmoomoo.com:300/browserstack_jobcomplete';
 
-var BrowserStack_JobCompleteUrl = 'https://eab3798e.ngrok.io/browserstack_jobcomplete';
+var BrowserStack_JobCompleteUrl = 'https://cbc2ea86.ngrok.io/browserstack_jobcomplete';
 var url = '';
 var platform = '';
+var user = '';
 
 var websiteUrl = "https://www.google.com";
 
@@ -29,6 +30,9 @@ function ExtractUrlAndPlatformFromQS(qs){
                 break;
             case 'platform':
                 platform = keyValue[1];
+                break;
+            case 'user':
+                user = keyValue[1];
                 break;
         }
     }
@@ -75,8 +79,9 @@ function getBrowsers_callback(error, browsers) {
         options.browsers = browsersToScreenshot;
         options.url = decodeURIComponent(url);;
         options.local = true;
-        options.callback_url = BrowserStack_JobCompleteUrl + '?platform=' + platform;
-        console.log(url)
+        options.wait_time = 10;
+        options.callback_url = BrowserStack_JobCompleteUrl + '?platform=' + platform + '&user=' + user;
+        console.log(options.callback_url)
         console.log(options.url)
         screenshotClient.generateScreenshots(options, function (error, job) {
             if (error) {
@@ -92,9 +97,24 @@ function getBrowsers_callback(error, browsers) {
 /// Routes ///
 // gets a JSON of available browsers
 app.route('/browsers')
-    .get(bodyParser.urlencoded({ extended: true }), function (req, res) {
+    .post(bodyParser.urlencoded({ extended: true }), function (req, res) {
         screenshotClient.getBrowsers(function(error, browsers) {
-            res.send(browsers);
+            var browsersToScreenshot= [];
+            switch (req.body.platform) {
+                case 'desktop':
+                    browsersToScreenshot = getDesktopBrowsers(browsers);
+                    break;
+                case 'tablet':
+                    browsersToScreenshot = getTabletBrowsers(browsers);
+                    break;
+                case 'smartphone':
+                    browsersToScreenshot = getSmartphoneBrowsers(browsers);
+                    break;
+                case 'all':
+                    browsersToScreenshot = getAllPlatormBrowsers(browsers);
+                    break;
+            }
+            res.send(browsersToScreenshot);
         });
     })
 
@@ -202,8 +222,9 @@ function getLastestVersion(browsers, browserName){
 
 function getDesktopBrowsers(allBrowsers){
     var desktopBrowsers = allBrowsers.filter(function(browser){
-        return browser.os === 'Windows'
+        return browser.os === 'Windows' && browser.os_version !== 'XP'
     });
+
     var browsers = [];
     browsers.push(getLastestVersion(desktopBrowsers,'firefox'));
     browsers.push(getLastestVersion(desktopBrowsers,'chrome'));
