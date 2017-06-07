@@ -34,7 +34,7 @@ function Slack_ReceiveMooMooCommand(data){
     var expression = /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi;
     var regex = new RegExp(expression);
     var url = data.text;
-
+    console.log('a' + data.channel_id)
     if (!url.match(regex)) {
         web.chat.postMessage(data.channel_id, 'please enter a valid URL');
     } else {
@@ -45,23 +45,24 @@ function Slack_ReceiveMooMooCommand(data){
 // sends the message card to user asking them what browsers they want to generate screenshot
 function Slack_SendMessageCard(url, channel) {
     var json = generateCardMessage(url, channel);
+    console.log(channel)
     var attachmentData = attachments.cards.platformAttachments(url);
     web.chat.postMessage(json.channel, json.text, {attachments: attachmentData });
 }
 // this function receives the response from the slack message card
 function Slack_ReceiveMessageCard(action) {
-    var platform = action.platform;
+    var actionJson = JSON.parse(action.value);
 
-    var url = JSON.parse(action.value).url;
+    //var url = JSON.parse(action.value).url;
 
-    var browserStackSubmitJobUrl = BrowserStack_SubmitJobUrl + "?platform=" + platform + "&url=" + encodeURIComponent(url);
+    var browserStackSubmitJobUrl = BrowserStack_SubmitJobUrl + "?platform=" + actionJson.platform + "&url=" + encodeURIComponent(actionJson.url);
     console.log('submitting job to browserstack service: ' + browserStackSubmitJobUrl);
 
-    request({
-        url: browserStackSubmitJobUrl
-    }, function (error, response, body) {
-        console.log('slack service: browserstack job submitted', error);
-    })
+    // request({
+    //     url: browserStackSubmitJobUrl
+    // }, function (error, response, body) {
+    //     console.log('slack service: browserstack job submitted', error);
+    // })
 }
 
 function BrowserStack_JobComplete(data) {
@@ -91,6 +92,7 @@ function BrowserStack_JobComplete(data) {
     var channel = screenshotsChannel;
 
     web.chat.postMessage(channel, message);
+   // web.chat.postMessage(channel, json.text, {attachments: attachmentData });
 }
 
 function GetCardResponseMessage(platform, url) {
@@ -139,8 +141,10 @@ app.route('/slack_messageaction')
                         var url = card.url;
                         var message = GetCardResponseMessage(platform, url);
                         res.send(message);
+                    }else{
+                        res.send('MooMoo is a :cow:');
                     }
-                    res.send('MooMoo is a :cow:');
+
 
                     break
                 case 'displayScreenShot':
