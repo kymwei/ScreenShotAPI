@@ -10,47 +10,48 @@ var BrowserStack = require("browserstack");
 var BrowserStackCredentials = require("./BrowserStackCredentials.js");
 var screenshotClient = BrowserStack.createScreenshotClient(BrowserStackCredentials.BrowserStackCredentials());
 var restClient = BrowserStack.createClient(BrowserStackCredentials.BrowserStackCredentials());
-//var BrowserStack_JobCompleteUrl = 'http://www.chefmoomoo.com:300/browserstack_jobcomplete';
 
-var BrowserStack_JobCompleteUrl = 'https://cbc2ea86.ngrok.io/browserstack_jobcomplete';
+var BrowserStack_JobCompleteUrl = 'http://www.chefmoomoo.com:1234/browserstack_jobcomplete';
 var url = '';
 var platform = '';
-var user = '';
+
+const browserstackcmd = require('commander');
+
+
 
 var websiteUrl = "https://www.google.com";
 
-function ExtractUrlAndPlatformFromQS(qs){
-    console.log(qs);
-    var splitQS = qs.split('&');
-    for(var i = 0; i < splitQS.length; i++){
-        var keyValue = splitQS[i].split('=');
-        switch(keyValue[0]){
-            case 'url':
-                url = keyValue[1];
-                break;
-            case 'platform':
-                platform = keyValue[1];
-                break;
-            case 'user':
-                user = keyValue[1];
-                break;
-        }
-    }
-    if(url == '' || platform == '') {
-        return false;
-    }
-    return true;
-}
+// function ExtractUrlAndPlatformFromQS(qs){
+//     var splitQS = qs.split('&');
+//     for(var i = 0; i < splitQS.length; i++){
+//         var keyValue = splitQS[i].split('=');
+//         switch(keyValue[0]){
+//             case 'url':
+//                 url = keyValue[1];
+//                 break;
+//             case 'platform':
+//                 platform = keyValue[1];
+//                 break;
+//         }
+//     }
+//     if(url == '' || platform == '') {
+//         return false;
+//     }
+//     return true;
+// }
 
 function SubmitJobToBrowserStack(qs) {
-    if(!ExtractUrlAndPlatformFromQS(qs)) {
-        return false;
-    }
-    else {
+    if(browserstackcmd.url) {
+        url = decodeURIComponent(browserstackcmd.url);
+        platform = browserstackcmd.platform || 'all';
         screenshotClient.getBrowsers(getBrowsers_callback);
-        return true;
+    }else{
+        return false
     }
-    return false;
+
+
+
+
 }
 
 function getBrowsers_callback(error, browsers) {
@@ -77,12 +78,13 @@ function getBrowsers_callback(error, browsers) {
 
         var options = {};
         options.browsers = browsersToScreenshot;
-        options.url = decodeURIComponent(url);;
+        console.log('url' + url);
+
+        options.url = decodeURIComponent(url);
+        console.log('urldecode' + options);
         options.local = true;
-        options.wait_time = 10;
-        options.callback_url = BrowserStack_JobCompleteUrl + '?platform=' + platform + '&user=' + user;
-        console.log(options.callback_url)
-        console.log(options.url)
+        options.callback_url = BrowserStack_JobCompleteUrl + '?platform=' + platform;
+
         screenshotClient.generateScreenshots(options, function (error, job) {
             if (error) {
 
@@ -97,48 +99,20 @@ function getBrowsers_callback(error, browsers) {
 /// Routes ///
 // gets a JSON of available browsers
 app.route('/browsers')
-    .post(bodyParser.urlencoded({ extended: true }), function (req, res) {
+    .get(bodyParser.urlencoded({ extended: true }), function (req, res) {
         screenshotClient.getBrowsers(function(error, browsers) {
-            var browsersToScreenshot= [];
-            switch (req.body.platform) {
-                case 'desktop':
-                    browsersToScreenshot = getDesktopBrowsers(browsers);
-                    break;
-                case 'tablet':
-                    browsersToScreenshot = getTabletBrowsers(browsers);
-                    break;
-                case 'smartphone':
-                    browsersToScreenshot = getSmartphoneBrowsers(browsers);
-                    break;
-                case 'all':
-                    browsersToScreenshot = getAllPlatormBrowsers(browsers);
-                    break;
-            }
-            res.send(browsersToScreenshot);
+            res.send(browsers);
         });
     })
 
-// this is the route to receive the job from the slack app, the job receiver is get only
-app.route('/submitjob')
-    .get(bodyParser.urlencoded({ extended: true }), function (req, res) {
-        console.log('job received');
-        if(SubmitJobToBrowserStack(req._parsedUrl.query)) {
-            console.log('submit job is ok');
-            res.sendStatus(200);
-        }
-        else {
-            console.log('submit job is bad');
-            res.sendStatus(500);
-        }
 
-    })
 
-app.listen(port, function (err) {
-    if (err) {
-        return console.error('Error starting server: ', err)
-    }
-    console.log('BrowserStack Server successfully started on port %s', port)
-})
+// app.listen(port, function (err) {
+//     if (err) {
+//         return console.error('Error starting server: ', err)
+//     }
+//     console.log('BrowserStack Server successfully started on port %s', port)
+// })
 /// End Routes ///
 
 /* *** HANDLE BROWSER STUFF *** */
@@ -222,9 +196,8 @@ function getLastestVersion(browsers, browserName){
 
 function getDesktopBrowsers(allBrowsers){
     var desktopBrowsers = allBrowsers.filter(function(browser){
-        return browser.os === 'Windows' && browser.os_version !== 'XP'
+        return browser.os === 'Windows'
     });
-
     var browsers = [];
     browsers.push(getLastestVersion(desktopBrowsers,'firefox'));
     browsers.push(getLastestVersion(desktopBrowsers,'chrome'));
@@ -246,3 +219,24 @@ function sortByDeviceAlphabetically(a,b) {
 /* *** END HELPERS *** */
 
 /* *** END BROWSER STUFF *** */
+
+
+browserstackcmd
+    .version('0.0.1')
+    .option('-u, --url <url>', 'screenshot URL')
+    .option('-p, --platform [string]', 'desktop, smartphone, tablet, all')
+    .option('-s, --slacksUser [string]', 'slack user name')
+    .option('-v, --view [string]', 'zip, imgurl')
+    .parse(process.argv)
+
+console.log(browserstackcmd.url);
+
+if (browserstackcmd.url) {
+    SubmitJobToBrowserStack()
+}else {
+    console.error('no command given!');
+    process.exit(1);
+
+}
+
+
