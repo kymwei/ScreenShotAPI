@@ -104,7 +104,7 @@ function BrowserStack_JobComplete(data) {
     web.chat.postMessage(channel, message);
     //TODO: list time out device
     //TODO: ask user if want to display more
-    web.chat.postMessage(channel, '', {attachments: attachments.cards.dislpaySreenShot('test') });
+    //web.chat.postMessage(channel, '', {attachments: attachments.cards.dislpaySreenShot('test') });
 }
 
 function GetCardResponseMessage(platform, url) {
