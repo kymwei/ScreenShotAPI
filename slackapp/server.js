@@ -3,17 +3,17 @@ var express = require('express'),
     port = 1234,
     bodyParser = require('body-parser'),
     querystring = require('querystring'),
-    http = require("https");
+    request = require('request');
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-var request = require('request');
+// Slack Related Configuration
 var slackToken = require("./SlackCredentials.js");
 var token = slackToken.SlackCredentials.token;
 var WebClient = require('@slack/client').WebClient;
 var web = new WebClient(token);
-var screenshotsChannel = 'general';
+var screenshotsChannel = 'MooMoo';
 var attachments = require("./Attachments.js");
 
 //var BrowserStack_SubmitJobUrl = 'http://www.chefmoomoo.com:300/submitjob';
@@ -29,13 +29,20 @@ function generateCardMessage(url, channel){
     return message;
 }
 
-// handle the moo moo command from slack
-function Slack_ReceiveMooMooCommand(data){
+function validateUrl(url) {
     var expression = /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi;
     var regex = new RegExp(expression);
-    var url = data.text;
-
     if (!url.match(regex)) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+// handle the moo moo command from slack
+function Slack_ReceiveMooMooCommand(data){
+    var url = data.text;
+    if (validateUrl(url)) {
         web.chat.postMessage(data.channel_id, 'please enter a valid URL');
     } else {
         Slack_SendMessageCard(data);
@@ -70,9 +77,7 @@ function BrowserStack_JobComplete(data) {
     var callbackUrl = data.callback_url;
     // parse the platform out of the callback url, should be in the qs platform
     var queryString = callbackUrl.split('?')[1];
-    //console.log('queryString: ' + queryString);
     var keyValues =  queryString.split('&');
-    //console.log('keyValues: ' +keyValues);
     var platform = '';
     var user = '';
     for(var i = 0; i < keyValues.length; i++) {
@@ -136,8 +141,13 @@ function GetRandomCatMessage() {
 /// Routes ///
 
 // slack_messageaction
-//https://api.slack.com/interactive-messages#responding
 app.route('/slack_messageaction')
+    .post(bodyParser.urlencoded({ extended: true }), function (req, res) {
+        res.sendStatus(200);
+    })
+
+//https://api.slack.com/interactive-messages#responding
+app.route('/slack_messageaction_dev')
     .post(bodyParser.urlencoded({ extended: true }), function (req, res) {
         //TODO: use secure payload.token to verify it from slack
         if(req.body.payload) {
@@ -178,6 +188,11 @@ app.route('/slack_messageaction')
 // browserstack will call back to this function when it's done generating screenshots
 app.route('/browserstack_jobcomplete')
     .post(bodyParser.urlencoded({ extended: true }), function (req, res) {
+        res.sendStatus(200)
+    })
+
+app.route('/browserstack_jobcomplete_dev')
+    .post(bodyParser.urlencoded({ extended: true }), function (req, res) {
         BrowserStack_JobComplete(req.body);
     })
 
@@ -187,9 +202,20 @@ app.route('/slack_moomoo')
         res.sendStatus(200)
     })
     .post(bodyParser.urlencoded({ extended: true }), function (req, res) {
+        res.sendStatus(200)
+    })
+
+// Slack moomoo command receiver
+app.route('/slack_moomoo_dev')
+    .get(function (req, res) {
+        res.sendStatus(200)
+    })
+    .post(bodyParser.urlencoded({ extended: true }), function (req, res) {
         Slack_ReceiveMooMooCommand(req.body);
         res.end();
     })
+
+/// End Routes ///
 
 app.listen(port, function (err) {
     if (err) {
@@ -197,4 +223,3 @@ app.listen(port, function (err) {
     }
     console.log('Slack Server successfully started on port %s', port)
 })
-/// End Routes ///
