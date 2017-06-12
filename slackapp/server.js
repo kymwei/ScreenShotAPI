@@ -19,16 +19,6 @@ var attachments = require("./Attachments.js");
 //var BrowserStack_SubmitJobUrl = 'http://www.chefmoomoo.com:300/submitjob';
 var BrowserStack_SubmitJobUrl = 'http://localhost:300/submitjob';
 
-
-function generateCardMessage(url, channel){
-    var message = {
-        token: token,
-        channel: channel,
-        text : decodeURIComponent(url)
-    };
-    return message;
-}
-
 function validateUrl(url) {
     var expression = /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi;
     var regex = new RegExp(expression);
@@ -51,8 +41,6 @@ function Slack_ReceiveMooMooCommand(data){
 
 // sends the message card to user asking them what browsers they want to generate screenshot
 function Slack_SendMessageCard(data) {
-    var json = generateCardMessage(data.text, data.channel_id, data.user_name);
-
     var attachmentData = attachments.cards.platformAttachments(data.text, data.user_name);
     web.chat.postMessage(data.channel_id, '', {attachments: attachmentData });
 }
