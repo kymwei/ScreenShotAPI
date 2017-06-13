@@ -80,8 +80,8 @@ function getBrowsers_callback(error, browsers) {
         options.local = true;
         options.wait_time = 10;
         options.callback_url = BrowserStack_JobCompleteUrl + '?platform=' + platform + '&user=' + user;
-        console.log('callback url' + options.callback_url)
-        console.log('screnshot url' + options.url)
+        console.log('callback url: ' + options.callback_url)
+        console.log('screenshot url: ' + options.url)
         screenshotClient.generateScreenshots(options, function (error, job) {
 
         });
