@@ -13,7 +13,7 @@ var slackToken = require("./SlackCredentials.js");
 var token = slackToken.SlackCredentials.token;
 var WebClient = require('@slack/client').WebClient;
 var web = new WebClient(token);
-var screenshotsChannel = '#moomoo';
+var screenshotsChannel = '#moomoo-screenshots';
 var attachments = require("./Attachments.js");
 
 //var BrowserStack_SubmitJobUrl = 'http://www.chefmoomoo.com:300/submitjob';
