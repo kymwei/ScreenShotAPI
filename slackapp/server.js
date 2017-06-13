@@ -152,7 +152,7 @@ app.route('/slack_messageaction_dev')
                         var message = GetCardResponseMessage(platform, url);
                         res.send(message);
                     }else{
-                        res.sendStatus(200)
+                        res.send('');
                     }
 
 
@@ -165,7 +165,7 @@ app.route('/slack_messageaction_dev')
                     // res.send(message);
                     break
                 default:
-                    res.sendStatus(200)
+                    res.send('');
 
             }
         }
