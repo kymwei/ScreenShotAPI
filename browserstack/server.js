@@ -12,7 +12,7 @@ var screenshotClient = BrowserStack.createScreenshotClient(BrowserStackCredentia
 var restClient = BrowserStack.createClient(BrowserStackCredentials.BrowserStackCredentials());
 //var BrowserStack_JobCompleteUrl = 'http://www.chefmoomoo.com:300/browserstack_jobcomplete';
 
-var BrowserStack_JobCompleteUrl = 'https://cbc2ea86.ngrok.io/browserstack_jobcomplete';
+var BrowserStack_JobCompleteUrl = 'http://www.chefmoomoo.com:1234/browserstack_jobcomplete';
 var url = '';
 var platform = '';
 var user = '';
