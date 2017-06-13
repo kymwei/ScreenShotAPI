@@ -116,8 +116,8 @@ function GetCardResponseMessage(platform, url) {
 
 function GetRandomCatMessage() {
         var msgs = [];
-        msgs.push('Your screenshots will be posted in ' + screenshotsChannel + ' in a :smiley_cat:-ment.');
-        msgs.push('Please wait a :smiley_cat:-ment, your screenshots will be posted in ' + screenshotsChannel + '.');
+        msgs.push('Your screenshots will be posted in ' + screenshotsChannel + ' in a meow-ment.');
+        msgs.push('Please wait a meow-ment, your screenshots will be posted in ' + screenshotsChannel + '.');
         msgs.push('Your screenshots will be posted in ' + screenshotsChannel + ' purr-ty soon.');
         msgs.push('Head over to ' + screenshotsChannel + ' for your :paw_prints:-some screenshots.');
         msgs.push("We're cooking up your screenshots right meow.  Head over to " + screenshotsChannel);
