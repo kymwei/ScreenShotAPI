@@ -74,21 +74,16 @@ function getBrowsers_callback(error, browsers) {
         return false;
     }
     else {
-
         var options = {};
         options.browsers = browsersToScreenshot;
         options.url = decodeURIComponent(url);;
         options.local = true;
         options.wait_time = 10;
         options.callback_url = BrowserStack_JobCompleteUrl + '?platform=' + platform + '&user=' + user;
-        console.log(options.callback_url)
-        console.log(options.url)
+        console.log('callback url' + options.callback_url)
+        console.log('screnshot url' + options.url)
         screenshotClient.generateScreenshots(options, function (error, job) {
-            if (error) {
 
-            } else {
-
-            }
         });
 
         return true;

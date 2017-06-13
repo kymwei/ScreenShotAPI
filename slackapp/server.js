@@ -61,6 +61,7 @@ function Slack_ReceiveMessageCard(action) {
 }
 
 function BrowserStack_JobComplete(data) {
+    console.log('browserstack job complete received')
     console.log(data);
     var callbackUrl = data.callback_url;
     // parse the platform out of the callback url, should be in the qs platform
