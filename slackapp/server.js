@@ -13,7 +13,8 @@ var slackToken = require("./SlackCredentials.js");
 var token = slackToken.SlackCredentials.token;
 var WebClient = require('@slack/client').WebClient;
 var web = new WebClient(token);
-var screenshotsChannel = '#moomoo-screenshots';
+var screenshotsChannel = 'moomoo-screenshots';
+var screenshotsChannelId = 'C5U5224GN'
 var attachments = require("./Attachments.js");
 
 //var BrowserStack_SubmitJobUrl = 'http://www.chefmoomoo.com:300/submitjob';
@@ -111,10 +112,9 @@ function BrowserStack_JobComplete(data) {
             message = '<@' + userId + '|' + user + '> ' + platform + ' screenshots for \n' + url + '\n are here: ' + data.zipped_url;
             break;
     }
-    var channel = screenshotsChannel;
 
     console.log(message);
-    web.chat.postMessage(channel, message);
+    web.chat.postMessage(screenshotsChannelId, message);
     //TODO: list time out device
     //TODO: ask user if want to display more
     //web.chat.postMessage(channel, '', {attachments: attachments.cards.dislpaySreenShot('test') });
@@ -135,11 +135,11 @@ function GetCardResponseMessage(platform, url) {
 
 function GetRandomCatMessage() {
         var msgs = [];
-        msgs.push('Your screenshots will be posted in ' + screenshotsChannel + ' in a meow-ment.');
-        msgs.push('Please wait a meow-ment, your screenshots will be posted in ' + screenshotsChannel + '.');
-        msgs.push('Your screenshots will be posted in ' + screenshotsChannel + ' purr-ty soon.');
-        msgs.push('Head over to ' + screenshotsChannel + ' for your :paw_prints:-some screenshots.');
-        msgs.push("We're cooking up your screenshots right meow.  Head over to " + screenshotsChannel);
+        msgs.push('Your screenshots will be posted in <#' + screenshotsChannelId + '|' + screenshotsChannel + '> in a meow-ment.');
+        msgs.push('Please wait a meow-ment, your screenshots will be posted in <#' + screenshotsChannelId + '|' + screenshotsChannel + '>.');
+        msgs.push('Your screenshots will be posted in <#' + screenshotsChannelId + '|' + screenshotsChannel + '> purr-ty soon.');
+        msgs.push('Head over to <#' + screenshotsChannelId + '|' + screenshotsChannel + '> for your :paw_prints:-some screenshots.');
+        msgs.push("We're cooking up your screenshots right meow.  Head over to <#" + screenshotsChannelId + "|" + screenshotsChannel + ">");
 
         var index =  Math.floor(Math.random() * msgs.length);
         console.log(index);
