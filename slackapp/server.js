@@ -61,6 +61,8 @@ function Slack_SendMessageCard(data) {
         }
         else {
             console.log(error);
+            console.log(response);
+            console.log(body);
         }
     })
 }
