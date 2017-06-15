@@ -59,6 +59,9 @@ function Slack_SendMessageCard(data) {
             // Print out the response body
             console.log(body)
         }
+        else {
+            console.log(error);
+        }
     })
 }
 // this function receives the response from the slack message card
