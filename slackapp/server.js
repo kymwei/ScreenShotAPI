@@ -133,7 +133,40 @@ function GetRandomCatMessage() {
 // slack_messageaction
 app.route('/slack_messageaction')
     .post(bodyParser.urlencoded({ extended: true }), function (req, res) {
-        res.sendStatus(200);
+        //TODO: use secure payload.token to verify it from slack
+        if(req.body.payload) {
+            var payload = JSON.parse(req.body.payload);
+            switch (payload.callback_id){
+                case 'platforms':
+
+                    if(payload.actions[0].value.length > 0){
+
+                        Slack_ReceiveMessageCard(payload.actions[0]);
+                        var card = JSON.parse(payload.actions[0].value);
+                        var platform =  card.platform;
+                        var url = card.url;
+                        var message = GetCardResponseMessage(platform, url);
+                        res.send(message);
+                    }else{
+                        res.send(' ');
+                    }
+
+
+                    break
+                case 'displayScreenShot':
+                    // Slack_ReceiveMessageCard(payload);
+                    // var platform =  JSON.parse(payload.actions[0].value).platform;
+                    // var url = JSON.parse(payload.actions[0].value).url;
+                    // var message = GetCardResponseMessage(platform, url);
+                    // res.send(message);
+                    break
+                default:
+                    res.send(' ');
+
+            }
+        }
+
+
     })
 
 //https://api.slack.com/interactive-messages#responding
@@ -178,7 +211,7 @@ app.route('/slack_messageaction_dev')
 // browserstack will call back to this function when it's done generating screenshots
 app.route('/browserstack_jobcomplete')
     .post(bodyParser.urlencoded({ extended: true }), function (req, res) {
-        res.sendStatus(200)
+        BrowserStack_JobComplete(req.body);
     })
 
 app.route('/browserstack_jobcomplete_dev')
@@ -192,7 +225,8 @@ app.route('/slack_moomoo')
         res.sendStatus(200)
     })
     .post(bodyParser.urlencoded({ extended: true }), function (req, res) {
-        res.sendStatus(200)
+        Slack_ReceiveMooMooCommand(req.body);
+        res.end();
     })
 
 // Slack moomoo command receiver
