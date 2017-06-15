@@ -18,8 +18,6 @@ var platform = '';
 var user = '';
 var userId = '';
 
-var websiteUrl = "https://www.google.com";
-
 function ExtractUrlAndPlatformFromQS(qs){
     console.log(qs);
     var splitQS = qs.split('&');
@@ -40,7 +38,7 @@ function ExtractUrlAndPlatformFromQS(qs){
                 break;
         }
     }
-    if(url == '' || platform == '' || userid == '') {
+    if(url == '' || platform == '' || userId == '') {
         return false;
     }
     return true;
