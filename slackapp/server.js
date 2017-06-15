@@ -31,11 +31,8 @@ function validateUrl(url) {
 
 // handle the moo moo command from slack
 function Slack_ReceiveMooMooCommand(data){
-    var url = data.text;
     if (validateUrl(url)) {
-        console.log(data);
         return "Please enter a valid URL";
-        //web.chat.postMessage(data.channel_id, 'please enter a valid URL');
     } else {
         Slack_SendMessageCard(data);
     }
@@ -43,6 +40,7 @@ function Slack_ReceiveMooMooCommand(data){
 
 // sends the message card to user asking them what browsers they want to generate screenshot
 function Slack_SendMessageCard(data) {
+    console.log(data);
     var attachmentData = attachments.cards.platformAttachments(data.text, data.user_name);
     web.chat.postMessage(data.channel_id, '', {attachments: attachmentData });
 }
