@@ -54,7 +54,6 @@ function Slack_SendMessageCard(data) {
         headers: headers,
         json: {
             response_type: "ephemeral",
-            text: "Sorry, that didn't work. Please try again.",
             attachments: attachmentData
         }
     }
