@@ -44,7 +44,7 @@ function Slack_SendMessageCard(data) {
     console.log(data);
 
     var headers = {
-        'Content-Type':     'application/json'
+        'Content-Type': 'application/json'
     }
 
     var options = {
@@ -53,24 +53,13 @@ function Slack_SendMessageCard(data) {
         headers: headers,
         form: {'response_type': 'ephemeral ', 'text': 'test'}
     }
-    
+
     request(options, function (error, response, body) {
         if (!error && response.statusCode == 200) {
             // Print out the response body
             console.log(body)
         }
     })
-
-    var url =
-    var attachmentData = attachments.cards.platformAttachments(data.text, data.user_name);
-    request({
-        url: url
-    }, function (error, response, body) {
-        console.log('slack service: browserstack job submitted', error);
-    })
-
-
-    web.chat.postMessage(data.channel_id, '', {attachments: attachmentData });
 }
 // this function receives the response from the slack message card
 function Slack_ReceiveMessageCard(action) {
