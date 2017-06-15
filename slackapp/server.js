@@ -34,7 +34,7 @@ function Slack_ReceiveMooMooCommand(data){
     var url = data.text;
     if (validateUrl(url)) {
         console.log(data);
-        web.chat.postMessage('@' + data.user_name, 'please enter a valid URL');
+        web.chat.postMessage(data.channel_id, 'please enter a valid URL');
     } else {
         Slack_SendMessageCard(data);
     }
@@ -227,6 +227,7 @@ app.route('/slack_moomoo')
     })
     .post(bodyParser.urlencoded({ extended: true }), function (req, res) {
         Slack_ReceiveMooMooCommand(req.body);
+        console.log('end slack_moomoo')
         res.end();
     })
 
