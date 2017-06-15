@@ -16,6 +16,7 @@ var BrowserStack_JobCompleteUrl = 'http://www.chefmoomoo.com:1234/browserstack_j
 var url = '';
 var platform = '';
 var user = '';
+var userId = '';
 
 var websiteUrl = "https://www.google.com";
 
@@ -34,9 +35,12 @@ function ExtractUrlAndPlatformFromQS(qs){
             case 'user':
                 user = keyValue[1];
                 break;
+            case 'userid':
+                userId = keyValue[1];
+                break;
         }
     }
-    if(url == '' || platform == '') {
+    if(url == '' || platform == '' || userid == '') {
         return false;
     }
     return true;
@@ -79,7 +83,7 @@ function getBrowsers_callback(error, browsers) {
         options.url = decodeURIComponent(url);;
         options.local = true;
         options.wait_time = 10;
-        options.callback_url = BrowserStack_JobCompleteUrl + '?platform=' + platform + '&user=' + user;
+        options.callback_url = BrowserStack_JobCompleteUrl + '?platform=' + platform + '&user=' + user + '&userid=' + userId;
         console.log('callback url: ' + options.callback_url)
         console.log('screenshot url: ' + options.url)
         screenshotClient.generateScreenshots(options, function (error, job) {
