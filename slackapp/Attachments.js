@@ -1,6 +1,5 @@
 exports.cards = {
      platformAttachments : function (url, user, userid) {
-         console.log(userid);
         return attachments = [
             {
                 "text": "Select the platforms to get screenshots",
