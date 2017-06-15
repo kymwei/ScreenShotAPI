@@ -82,6 +82,7 @@ function BrowserStack_JobComplete(data) {
     var keyValues =  queryString.split('&');
     var platform = '';
     var user = '';
+    var userId = '';
     for(var i = 0; i < keyValues.length; i++) {
 
         var keyValue = keyValues[i].split('=');
@@ -93,6 +94,9 @@ function BrowserStack_JobComplete(data) {
             case 'user':
                 user = keyValue[1];
                 break;
+            case 'userid':
+                userId = keyValue[1];
+                break;
         }
 
     }
@@ -100,10 +104,10 @@ function BrowserStack_JobComplete(data) {
     var message = 'Screenshots for ' + url + ' are here: ' + data.zipped_url;
     switch (platform) {
         case 'all':
-            message = '@' + user + ' screenshots for all platforms for \n' + url + '\n zip file are here: ' + data.zipped_url;
+            message = '<@' + userId + '|' + user + '> screenshots for all platforms for \n' + url + '\n zip file are here: ' + data.zipped_url;
             break;
         default:
-            message = '@' + user + ' ' + platform + ' screenshots for \n' + url + '\n are here: ' + data.zipped_url;
+            message = '<@' + userId + '|' + user + '> ' + platform + ' screenshots for \n' + url + '\n are here: ' + data.zipped_url;
             break;
     }
     var channel = screenshotsChannel;
