@@ -34,7 +34,8 @@ function Slack_ReceiveMooMooCommand(data){
     var url = data.text;
     if (validateUrl(url)) {
         console.log(data);
-        web.chat.postMessage(data.channel_id, 'please enter a valid URL');
+        return "Please enter a valid URL";
+        //web.chat.postMessage(data.channel_id, 'please enter a valid URL');
     } else {
         Slack_SendMessageCard(data);
     }
@@ -226,21 +227,12 @@ app.route('/slack_moomoo')
         res.sendStatus(200)
     })
     .post(bodyParser.urlencoded({ extended: true }), function (req, res) {
-        Slack_ReceiveMooMooCommand(req.body);
-        console.log('end slack_moomoo')
-        res.end();
+        var msg = Slack_ReceiveMooMooCommand(req.body);
+        if(msg && msg.length > 0){
+            res.send(msg);
+        }
+        res.sendStatus(200);
     })
-
-// Slack moomoo command receiver
-app.route('/slack_moomoo_dev')
-    .get(function (req, res) {
-        res.sendStatus(200)
-    })
-    .post(bodyParser.urlencoded({ extended: true }), function (req, res) {
-        Slack_ReceiveMooMooCommand(req.body);
-        res.end();
-    })
-
 /// End Routes ///
 
 app.listen(port, function (err) {
