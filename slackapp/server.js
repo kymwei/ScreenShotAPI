@@ -54,8 +54,6 @@ function Slack_SendMessageCard(data) {
         }
     }
 
-    console.log(options.json.attachments[0].actions);
-
     // send card
     request(options, function (error, response, body) {
 
@@ -159,7 +157,7 @@ app.route('/slack_messageaction')
                 case 'platforms':
 
                     if(payload.actions[0].value.length > 0){
-
+                        console.log(payload.actions[0].value);
                         Slack_ReceiveMessageCard(payload.actions[0]);
                         var card = JSON.parse(payload.actions[0].value);
                         var platform =  card.platform;
