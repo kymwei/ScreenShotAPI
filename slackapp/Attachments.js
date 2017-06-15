@@ -1,5 +1,5 @@
 exports.cards = {
-     platformAttachments : function (url, user) {
+     platformAttachments : function (url, user, userid) {
         return attachments = [
             {
                 "text": "Select the platforms to get screenshots",
@@ -12,26 +12,26 @@ exports.cards = {
                         "name": "platform",
                         "text": "All",
                         "type": "button",
-                        "value": JSON.stringify({platform:"all",url:url, user: user}),
+                        "value": JSON.stringify({platform:"all",url:url, user: user, userid: userid}),
                         "style": "primary"
                     },
                     {
                         "name": "platform",
                         "text": "Desktop",
                         "type": "button",
-                        "value": JSON.stringify({platform:"desktop",url:url, user: user})
+                        "value": JSON.stringify({platform:"desktop",url:url, user: user, userid: userid})
                     },
                     {
                         "name": "platform",
                         "text": "Tablet",
                         "type": "button",
-                        "value": JSON.stringify({platform:"tablet",url:url, user: user})
+                        "value": JSON.stringify({platform:"tablet",url:url, user: user, userid: userid})
                     },
                     {
                         "name": "platform",
                         "text": "Smartphone",
                         "type": "button",
-                        "value": JSON.stringify({platform:"smartphone",url:url, user: user})
+                        "value": JSON.stringify({platform:"smartphone",url:url, user: user, userid: userid})
                     },
                     {
                         "name": "platform",

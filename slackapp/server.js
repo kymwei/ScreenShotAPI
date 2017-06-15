@@ -50,7 +50,7 @@ function Slack_SendMessageCard(data) {
         },
         json: {
             response_type: "ephemeral",
-            attachments: attachments.cards.platformAttachments(data.text, data.user_name)
+            attachments: attachments.cards.platformAttachments(data.text, data.user_name, data.user_id)
         }
     }
 
@@ -182,47 +182,6 @@ app.route('/slack_messageaction')
 
             }
         }
-
-
-    })
-
-//https://api.slack.com/interactive-messages#responding
-app.route('/slack_messageaction_dev')
-    .post(bodyParser.urlencoded({ extended: true }), function (req, res) {
-        //TODO: use secure payload.token to verify it from slack
-        if(req.body.payload) {
-            var payload = JSON.parse(req.body.payload);
-            switch (payload.callback_id){
-                case 'platforms':
-
-                    if(payload.actions[0].value.length > 0){
-
-                        Slack_ReceiveMessageCard(payload.actions[0]);
-                        var card = JSON.parse(payload.actions[0].value);
-                        var platform =  card.platform;
-                        var url = card.url;
-                        var message = GetCardResponseMessage(platform, url);
-                        res.send(message);
-                    }else{
-                        res.send(' ');
-                    }
-
-
-                    break
-                case 'displayScreenShot':
-                    // Slack_ReceiveMessageCard(payload);
-                    // var platform =  JSON.parse(payload.actions[0].value).platform;
-                    // var url = JSON.parse(payload.actions[0].value).url;
-                    // var message = GetCardResponseMessage(platform, url);
-                    // res.send(message);
-                    break
-                default:
-                    res.send(' ');
-
-            }
-        }
-
-
     })
 
 // browserstack will call back to this function when it's done generating screenshots
