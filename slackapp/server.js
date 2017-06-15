@@ -231,7 +231,10 @@ app.route('/slack_moomoo')
         if(msg && msg.length > 0){
             res.send(msg);
         }
-        res.sendStatus(200);
+        else{
+            res.sendStatus(200);
+        }
+
     })
 /// End Routes ///
 
