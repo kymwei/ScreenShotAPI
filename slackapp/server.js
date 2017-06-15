@@ -112,6 +112,7 @@ function BrowserStack_JobComplete(data) {
     }
     var channel = screenshotsChannel;
 
+    console.log(message);
     web.chat.postMessage(channel, message);
     //TODO: list time out device
     //TODO: ask user if want to display more
