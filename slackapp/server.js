@@ -31,6 +31,7 @@ function validateUrl(url) {
 
 // handle the moo moo command from slack
 function Slack_ReceiveMooMooCommand(data){
+    var url = data.text;
     if (validateUrl(url)) {
         return "Please enter a valid URL";
     } else {
