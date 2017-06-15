@@ -71,7 +71,7 @@ function Slack_ReceiveMessageCard(action) {
     request({
         url: browserStackSubmitJobUrl
     }, function (error, response, body) {
-        
+
     })
 }
 
@@ -138,12 +138,10 @@ function GetRandomCatMessage() {
         msgs.push('Your screenshots will be posted in <#' + screenshotsChannelId + '|' + screenshotsChannel + '> in a meow-ment.');
         msgs.push('Please wait a meow-ment, your screenshots will be posted in <#' + screenshotsChannelId + '|' + screenshotsChannel + '>.');
         msgs.push('Your screenshots will be posted in <#' + screenshotsChannelId + '|' + screenshotsChannel + '> purr-ty soon.');
-        msgs.push('Head over to <#' + screenshotsChannelId + '|' + screenshotsChannel + '> for your :paw_prints:-some screenshots.');
+        msgs.push('Head over to <#' + screenshotsChannelId + '|' + screenshotsChannel + '> for your paw-some screenshots.');
         msgs.push("We're cooking up your screenshots right meow.  Head over to <#" + screenshotsChannelId + "|" + screenshotsChannel + ">");
 
         var index =  Math.floor(Math.random() * msgs.length);
-        console.log(index);
-
         return(msgs[index]);
 }
 
