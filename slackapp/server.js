@@ -56,7 +56,6 @@ function Slack_SendMessageCard(data) {
             text: "Sorry, that didn't work. Please try again."
         }
     }
-    }
 
     request(options, function (error, response, body) {
         if (!error && response.statusCode == 200) {
