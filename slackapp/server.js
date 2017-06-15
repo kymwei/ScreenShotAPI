@@ -42,6 +42,7 @@ function Slack_ReceiveMooMooCommand(data){
 // sends the message card to user asking them what browsers they want to generate screenshot
 function Slack_SendMessageCard(data) {
     // setup post
+    console.log(data);
     var options = {
         url: data.response_url,
         method: 'POST',
