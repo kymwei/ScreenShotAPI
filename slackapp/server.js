@@ -71,7 +71,7 @@ function Slack_ReceiveMessageCard(action) {
     request({
         url: browserStackSubmitJobUrl
     }, function (error, response, body) {
-        console.log('slack service: browserstack job submitted', error);
+        
     })
 }
 
