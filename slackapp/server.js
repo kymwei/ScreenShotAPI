@@ -42,6 +42,7 @@ function Slack_ReceiveMooMooCommand(data){
 // sends the message card to user asking them what browsers they want to generate screenshot
 function Slack_SendMessageCard(data) {
     console.log(data);
+    var attachmentData = attachments.cards.platformAttachments(data.text, data.user_name);
 
     var headers = {
         'Content-Type': 'application/json'
@@ -53,7 +54,8 @@ function Slack_SendMessageCard(data) {
         headers: headers,
         json: {
             response_type: "ephemeral",
-            text: "Sorry, that didn't work. Please try again."
+            text: "Sorry, that didn't work. Please try again.",
+            attachments: attachmentData
         }
     }
 
