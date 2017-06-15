@@ -232,7 +232,7 @@ app.route('/slack_moomoo')
             res.send(msg);
         }
         else{
-            res.sendStatus(200);
+            res.end();
         }
 
     })
