@@ -63,7 +63,7 @@ function Slack_SendMessageCard(data) {
 function Slack_ReceiveMessageCard(action) {
     var actionJson = JSON.parse(action.value);
     console.log(actionJson);
-    var browserStackSubmitJobUrl = BrowserStack_SubmitJobUrl + "?platform=" + actionJson.platform + "&user=" + actionJson.user + "&userid=" + actionJson.user_id + "&url=" + encodeURIComponent(actionJson.url);
+    var browserStackSubmitJobUrl = BrowserStack_SubmitJobUrl + "?platform=" + actionJson.platform + "&user=" + actionJson.user + "&userid=" + actionJson.userid + "&url=" + encodeURIComponent(actionJson.url);
     console.log('submitting job to browserstack service: ' + browserStackSubmitJobUrl);
 
     request({
