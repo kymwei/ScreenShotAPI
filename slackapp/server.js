@@ -51,7 +51,11 @@ function Slack_SendMessageCard(data) {
         url: data.response_url,
         method: 'POST',
         headers: headers,
-        form: {'response_type': 'ephemeral ', 'text': 'test'}
+        json: {
+            response_type: "ephemeral",
+            text: "Sorry, that didn't work. Please try again."
+        }
+    }
     }
 
     request(options, function (error, response, body) {
