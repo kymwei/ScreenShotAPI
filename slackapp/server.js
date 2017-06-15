@@ -60,8 +60,7 @@ function Slack_SendMessageCard(data) {
             console.log(body)
         }
         else {
-            console.log(error);
-            console.log(response);
+            console.log(response.statusCode);
             console.log(body);
         }
     })
