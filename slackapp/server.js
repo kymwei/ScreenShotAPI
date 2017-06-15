@@ -42,14 +42,39 @@ function Slack_ReceiveMooMooCommand(data){
 // sends the message card to user asking them what browsers they want to generate screenshot
 function Slack_SendMessageCard(data) {
     console.log(data);
+
+    var headers = {
+        'Content-Type':     'application/json'
+    }
+
+    var options = {
+        url: data.response_url,
+        method: 'POST',
+        headers: headers,
+        form: {'response_type': 'ephemeral ', 'text': 'test'}
+    }
+    
+    request(options, function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+            // Print out the response body
+            console.log(body)
+        }
+    })
+
+    var url =
     var attachmentData = attachments.cards.platformAttachments(data.text, data.user_name);
+    request({
+        url: url
+    }, function (error, response, body) {
+        console.log('slack service: browserstack job submitted', error);
+    })
+
+
     web.chat.postMessage(data.channel_id, '', {attachments: attachmentData });
 }
 // this function receives the response from the slack message card
 function Slack_ReceiveMessageCard(action) {
     var actionJson = JSON.parse(action.value);
-
-    //var url = JSON.parse(action.value).url;
 
     var browserStackSubmitJobUrl = BrowserStack_SubmitJobUrl + "?platform=" + actionJson.platform + "&user=" + actionJson.user + "&url=" + encodeURIComponent(actionJson.url);
     console.log('submitting job to browserstack service: ' + browserStackSubmitJobUrl);
