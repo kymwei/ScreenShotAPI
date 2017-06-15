@@ -54,7 +54,7 @@ function Slack_SendMessageCard(data) {
         }
     }
 
-    console.log(options.json.attachments.action[0]);
+    console.log(options.json.attachments[0].action[0]);
 
     // send card
     request(options, function (error, response, body) {
