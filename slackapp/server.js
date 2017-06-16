@@ -149,6 +149,9 @@ function GetRandomCatMessage() {
 
 // slack_messageaction
 app.route('/slack_messageaction')
+    .get(function (req, res) {
+        res.sendStatus(200)
+    })
     .post(bodyParser.urlencoded({ extended: true }), function (req, res) {
         //TODO: use secure payload.token to verify it from slack
         if(req.body.payload) {
@@ -186,11 +189,9 @@ app.route('/slack_messageaction')
 
 // browserstack will call back to this function when it's done generating screenshots
 app.route('/browserstack_jobcomplete')
-    .post(bodyParser.urlencoded({ extended: true }), function (req, res) {
-        BrowserStack_JobComplete(req.body);
+    .get(function (req, res) {
+        res.sendStatus(200)
     })
-
-app.route('/browserstack_jobcomplete_dev')
     .post(bodyParser.urlencoded({ extended: true }), function (req, res) {
         BrowserStack_JobComplete(req.body);
     })
@@ -201,6 +202,7 @@ app.route('/slack_moomoo')
         res.sendStatus(200)
     })
     .post(bodyParser.urlencoded({ extended: true }), function (req, res) {
+        console.log(msg.body);
         var msg = Slack_ReceiveMooMooCommand(req.body);
         if(msg && msg.length > 0){
             res.send(msg);
