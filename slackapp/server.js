@@ -145,18 +145,8 @@ function GetRandomCatMessage() {
         return(msgs[index]);
 }
 
-function validateRequestToken(req) {
-    console.log(req.body);
-    console.log(req.body.token);
-    console.log(slackToken.SlackCredentials.authToken);
-    if(req.body.token && req.body.token === slackToken.SlackCredentials.authToken){
-        console.log('authenticated');
-        return true;
-    }
-    else {
-        console.log('nope');
-        return false;
-    }
+function validateRequestToken(token) {
+    return token === slackToken.SlackCredentials.authToken;
 }
 
 /// Routes ///
@@ -167,8 +157,8 @@ app.route('/slack_messageaction')
         res.sendStatus(200)
     })
     .post(bodyParser.urlencoded({ extended: true }), function (req, res) {
-        //TODO: use secure payload.token to verify it from slack
         if(req.body.payload) {
+            console.log(req.body.payload);
             var payload = JSON.parse(req.body.payload);
             switch (payload.callback_id){
                 case 'platforms':
@@ -216,7 +206,7 @@ app.route('/slack_moomoo')
         res.sendStatus(200)
     })
     .post(bodyParser.urlencoded({ extended: true }), function (req, res) {
-        if(validateRequestToken(req)){
+        if(req.body && req.body.token && validateRequestToken(req.body.token)){
             var msg = Slack_ReceiveMooMooCommand(req.body);
             if(msg && msg.length > 0){
                 res.send(msg);
