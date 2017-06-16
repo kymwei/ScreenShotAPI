@@ -145,6 +145,16 @@ function GetRandomCatMessage() {
         return(msgs[index]);
 }
 
+function validateRequestToken(req) {
+    console.log(req.body);
+    if(req.body.token && req.body.token.length === slackToken.SlackCredentials.token){
+        console.log('authenticated');
+        return true;
+    }
+    console.log('nope');
+    return false;
+}
+
 /// Routes ///
 
 // slack_messageaction
@@ -202,15 +212,15 @@ app.route('/slack_moomoo')
         res.sendStatus(200)
     })
     .post(bodyParser.urlencoded({ extended: true }), function (req, res) {
-        console.log(msg.body);
-        var msg = Slack_ReceiveMooMooCommand(req.body);
-        if(msg && msg.length > 0){
-            res.send(msg);
+        if(validateRequestToken(req)){
+            var msg = Slack_ReceiveMooMooCommand(req.body);
+            if(msg && msg.length > 0){
+                res.send(msg);
+            }
+            else{
+                res.end();
+            }
         }
-        else{
-            res.end();
-        }
-
     })
 /// End Routes ///
 
