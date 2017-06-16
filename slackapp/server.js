@@ -158,7 +158,7 @@ app.route('/slack_messageaction')
     })
     .post(bodyParser.urlencoded({ extended: true }), function (req, res) {
         if(req.body.payload) {
-            console.log(req.body.payload);
+            console.log(req.body);
             var payload = JSON.parse(req.body.payload);
             switch (payload.callback_id){
                 case 'platforms':
