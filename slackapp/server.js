@@ -114,7 +114,7 @@ function BrowserStack_JobComplete(data) {
     }
 
     console.log(message);
-    web.chat.postMessage(screenshotsChannelId, message);
+    web.chat.postMessage('#' + screenshotsChannel, message);
     //TODO: list time out device
     //TODO: ask user if want to display more
     //web.chat.postMessage(channel, '', {attachments: attachments.cards.dislpaySreenShot('test') });
@@ -158,7 +158,6 @@ app.route('/slack_messageaction')
     })
     .post(bodyParser.urlencoded({ extended: true }), function (req, res) {
         if(req.body.payload) {
-            console.log(req.body);
             var payload = JSON.parse(req.body.payload);
             switch (payload.callback_id){
                 case 'platforms':
