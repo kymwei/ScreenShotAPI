@@ -147,7 +147,7 @@ function GetRandomCatMessage() {
 
 function validateRequestToken(req) {
     console.log(req.body);
-    if(req.body.token && req.body.token === slackToken.SlackCredentials.token){
+    if(req.body.token && req.body.token === slackToken.SlackCredentials.authToken){
         console.log('authenticated');
         return true;
     }
@@ -220,6 +220,9 @@ app.route('/slack_moomoo')
             else{
                 res.end();
             }
+        }
+        else{
+            res.send('not authenticated');
         }
     })
 /// End Routes ///
