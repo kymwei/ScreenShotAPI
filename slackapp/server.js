@@ -147,7 +147,7 @@ function GetRandomCatMessage() {
 
 function validateRequestToken(req) {
     console.log(req.body);
-    if(req.body.token && req.body.token.length === slackToken.SlackCredentials.token){
+    if(req.body.token && req.body.token === slackToken.SlackCredentials.token){
         console.log('authenticated');
         return true;
     }
