@@ -147,12 +147,16 @@ function GetRandomCatMessage() {
 
 function validateRequestToken(req) {
     console.log(req.body);
+    console.log(req.body.token);
+    console.log(slackToken.SlackCredentials.authToken);
     if(req.body.token && req.body.token === slackToken.SlackCredentials.authToken){
         console.log('authenticated');
         return true;
     }
-    console.log('nope');
-    return false;
+    else {
+        console.log('nope');
+        return false;
+    }
 }
 
 /// Routes ///
